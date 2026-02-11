@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## CSR Impact Assessment Platform — MVP
 
-**Version:** 1.0  
-**Date:** February 2025  
+**Version:** 2.0
+**Date:** February 2026
 **Author:** Product Team  
 **For:** Claude Code Development Agent  
 
@@ -11,15 +11,15 @@
 ## 1. Executive Summary
 
 ### 1.1 What We're Building
-A web application that digitizes the CSR impact assessment workflow. The platform takes the MoU (Memorandum of Understanding) as the single source of truth and tracks project progress through NGO reports, field evidence, SROI calculation, and report generation.
+A multi-project web application that digitizes the CSR impact assessment workflow. Users manage multiple CSR projects from a central dashboard. Each project takes the MoU (Memorandum of Understanding) as the single source of truth and tracks project progress through NGO reports, field evidence, SROI calculation, and report generation.
 
 ### 1.2 Core Value Proposition
-- **For CSR Managers:** Visibility into project progress without waiting for annual assessments
-- **For Assessment Teams:** Transparent SROI calculation with auditable evidence chain
-- **For Leadership:** Professional reports generated in minutes, not months
+- **For CSR Managers:** Single dashboard to track all CSR projects, with visibility into progress without waiting for annual assessments
+- **For Assessment Teams:** Transparent SROI calculation with auditable evidence chain, per project
+- **For Leadership:** Professional reports generated in minutes, not months, across the entire CSR portfolio
 
 ### 1.3 MVP Scope
-5 functional modules that can be demonstrated end-to-end with sample data. AI document extraction is stubbed — the UI and data flow must be complete.
+A multi-project dashboard + 5 functional modules per project that can be demonstrated end-to-end with sample data. Users can create and manage multiple projects, each running the full 5-stage assessment pipeline independently. AI document extraction is real (Claude API + Ollama fallback) — the UI and data flow must be complete.
 
 ---
 
@@ -65,12 +65,18 @@ A web application that digitizes the CSR impact assessment workflow. The platfor
 
 ## 3. Module Breakdown
 
-The application is divided into 5 modules + 1 shell module. Build in this order.
+The application has two levels: a **Project Dashboard** (listing all projects) and a **5-stage pipeline** per project. Build in this order.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    MODULE 0: App Shell                       │
-│  (Navigation, Layout, Global State, Theme)                   │
+│               PROJECT DASHBOARD (Landing Page)               │
+│  (List all projects, create new, open existing)              │
+└──────────────────────────┬──────────────────────────────────┘
+                           │  User selects or creates a project
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│              MODULE 0: App Shell (per project)               │
+│  (Navigation, Layout, Project-Scoped State, Theme)           │
 └─────────────────────────────────────────────────────────────┘
                               │
         ┌─────────────────────┼─────────────────────┐
@@ -81,21 +87,90 @@ The application is divided into 5 modules + 1 shell module. Build in this order.
 └───────────────┘    └───────────────┘    └───────────────┘
                                                   │
                      ┌────────────────────────────┘
-                     ▼                     
+                     ▼
         ┌───────────────┐    ┌───────────────┐
         │   MODULE 4    │───▶│   MODULE 5    │
         │     SROI      │    │ Report Gen    │
         └───────────────┘    └───────────────┘
 ```
 
+Each project is a self-contained instance of the 5-stage flow with its own MoU, KPIs, reports, evidence, SROI calculation, and generated report.
+
 ---
 
-## 4. Module 0: Application Shell
+## 4. Project Dashboard (Landing Page)
 
 ### 4.1 Purpose
-Provides the navigation, layout, and global state container for all modules.
+The first screen users see. Lists all CSR projects with their current status and allows creating new projects or opening existing ones.
 
-### 4.2 Features
+### 4.2 User Flow
+```
+Landing Page → View Project List → Create New / Open Existing → Enter 5-Stage Flow
+```
+
+### 4.3 Features
+
+| Feature ID | Feature | Description | Priority |
+|------------|---------|-------------|----------|
+| PD-F1 | Project List | Display all projects as cards with name, NGO, status, current stage, last updated | Must Have |
+| PD-F2 | Create Project | Button to create a new project (enters Stage 1 with empty state) | Must Have |
+| PD-F3 | Open Project | Click a project card to enter its 5-stage flow at the current stage | Must Have |
+| PD-F4 | Project Status Summary | Each card shows: stage progress (1-5), completion percentage, SROI if calculated | Must Have |
+| PD-F5 | Delete Project | Delete a project with confirmation dialog | Should Have |
+| PD-F6 | Empty State | When no projects exist, show a welcome message with "Create Your First Project" CTA | Must Have |
+| PD-F7 | Project Count | Header shows total number of projects | Should Have |
+
+### 4.4 Data Schemas
+
+```typescript
+interface Project {
+  id: string;
+  name: string; // Derived from MoU extraction or user input
+  ngoName: string | null; // Populated after Stage 1
+  createdAt: string;
+  updatedAt: string;
+  currentStage: 1 | 2 | 3 | 4 | 5;
+  stageStatus: {
+    stage1Complete: boolean;
+    stage2Complete: boolean;
+    stage3Complete: boolean;
+    stage4Complete: boolean;
+    stage5Complete: boolean;
+  };
+
+  // All module data is scoped to this project
+  mou: MoUData;
+  reports: ReportsData;
+  evidence: EvidenceData;
+  sroi: SROIData;
+  report: ReportData;
+}
+```
+
+### 4.5 UI Specifications
+
+**Project Card:**
+- White card with subtle shadow, 12px border radius
+- Left accent bar colored by furthest completed stage (teal→emerald→blue→gold→purple)
+- Top: Project name (16px semibold) + NGO name (14px muted)
+- Middle: Mini stage progress bar (5 dots showing stage completion)
+- Bottom: Last updated date + SROI ratio badge (if available)
+- Hover: Elevation increases, cursor pointer
+
+**Empty State:**
+- Centered illustration/icon
+- "No projects yet" heading
+- "Create your first CSR impact assessment" subtext
+- Primary CTA button: "Create New Project"
+
+---
+
+## 5. Module 0: Application Shell (Per Project)
+
+### 5.1 Purpose
+Provides the navigation, layout, and project-scoped state container for all modules within a single project.
+
+### 5.2 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -103,11 +178,13 @@ Provides the navigation, layout, and global state container for all modules.
 | M0-F2 | Stage Locking | User cannot skip ahead — must complete each stage sequentially | Must Have |
 | M0-F3 | Back Navigation | User can go back to previous stages to review/edit | Must Have |
 | M0-F4 | Progress Indicator | Visual indicator of completion status per stage | Should Have |
-| M0-F5 | Global State Store | Central state holding all data from all modules | Must Have |
-| M0-F6 | Reset Functionality | Button to clear all data and start fresh | Should Have |
+| M0-F5 | Project-Scoped State | State holding all data for the active project | Must Have |
+| M0-F6 | Reset Project | Button to clear all data for the current project and start fresh | Should Have |
 | M0-F7 | Responsive Layout | Works on desktop and tablet (minimum 768px width) | Must Have |
+| M0-F8 | Back to Dashboard | Button/link in header to return to the project dashboard | Must Have |
+| M0-F9 | Project Name in Header | Display the current project name in the app header | Must Have |
 
-### 4.3 UI Specifications
+### 5.3 UI Specifications
 
 **Stage Stepper:**
 - Horizontal bar at top of content area
@@ -120,12 +197,26 @@ Provides the navigation, layout, and global state container for all modules.
 - Side padding: 24px on desktop, 16px on tablet
 - Background: Off-white (#F8FAFC)
 
-### 4.4 Global State Schema
+### 5.4 Global State Schema
 
 ```typescript
 interface AppState {
+  // Multi-project support
+  projects: Project[];
+  activeProjectId: string | null; // null = on dashboard
+
+  // Navigation
+  view: 'dashboard' | 'project'; // Which screen is showing
+}
+
+interface Project {
+  id: string;
+  name: string;
+  ngoName: string | null;
+  createdAt: string;
+  updatedAt: string;
   currentStage: 1 | 2 | 3 | 4 | 5;
-  
+
   // Module 1 data
   mou: {
     fileName: string | null;
@@ -134,19 +225,19 @@ interface AppState {
     kpis: KPI[];
     isConfirmed: boolean;
   };
-  
+
   // Module 2 data
   reports: {
     files: ReportFile[];
     progressData: ProgressDataPoint[];
   };
-  
+
   // Module 3 data
   evidence: {
     files: EvidenceFile[];
     validationResults: ValidationResult[];
   };
-  
+
   // Module 4 data
   sroi: {
     investment: number;
@@ -154,7 +245,7 @@ interface AppState {
     adjustments: AdjustmentFactors;
     calculatedRatio: number | null;
   };
-  
+
   // Module 5 data
   report: {
     generatedAt: Date | null;
@@ -165,17 +256,17 @@ interface AppState {
 
 ---
 
-## 5. Module 1: MoU Upload & KPI Extraction
+## 6. Module 1: MoU Upload & KPI Extraction
 
-### 5.1 Purpose
+### 6.1 Purpose
 User uploads the MoU document. System extracts project details and KPIs. User reviews, edits if needed, and confirms.
 
-### 5.2 User Flow
+### 6.2 User Flow
 ```
 Upload MoU PDF → Loading/Processing → Review Extracted Data → Edit if needed → Confirm → Proceed to Stage 2
 ```
 
-### 5.3 Features
+### 6.3 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -190,7 +281,7 @@ Upload MoU PDF → Loading/Processing → Review Extracted Data → Edit if need
 | M1-F9 | Confirm Button | Locks in the data and enables Stage 2 | Must Have |
 | M1-F10 | Re-upload Option | User can upload a different file, clears previous data | Should Have |
 
-### 5.4 Data Schemas
+### 6.4 Data Schemas
 
 ```typescript
 interface ProjectDetails {
@@ -212,7 +303,7 @@ interface KPI {
 }
 ```
 
-### 5.5 AI Extraction Interface
+### 6.5 AI Extraction Interface
 
 ```typescript
 // Stub function — technical agent to implement with chosen AI API
@@ -234,7 +325,7 @@ The AI should be instructed to extract:
 5. All measurable KPIs with their target values
 6. Classify each KPI as output (activity), outcome (immediate result), or impact (long-term change)
 
-### 5.6 Mock Data for Development
+### 6.6 Mock Data for Development
 
 ```typescript
 const mockProjectDetails: ProjectDetails = {
@@ -258,7 +349,7 @@ const mockKPIs: KPI[] = [
 ];
 ```
 
-### 5.7 UI Specifications
+### 6.7 UI Specifications
 
 **Upload Zone:**
 - Dashed border (#0891B2), rounded corners
@@ -274,17 +365,17 @@ const mockKPIs: KPI[] = [
 
 ---
 
-## 6. Module 2: Progress Report Matching
+## 7. Module 2: Progress Report Matching
 
-### 6.1 Purpose
+### 7.1 Purpose
 User uploads NGO progress reports. System extracts reported values and matches them against the KPIs defined in Module 1. Displays progress dashboard.
 
-### 6.2 User Flow
+### 7.2 User Flow
 ```
 Upload Report(s) → Processing → View Progress Dashboard → Upload More (optional) → Proceed to Stage 3
 ```
 
-### 6.3 Features
+### 7.3 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -299,7 +390,7 @@ Upload Report(s) → Processing → View Progress Dashboard → Upload More (opt
 | M2-F9 | Report Timeline | Visual timeline showing which report contributed which data | Should Have |
 | M2-F10 | Proceed Button | Enabled when at least 1 report is processed | Must Have |
 
-### 6.4 Data Schemas
+### 7.4 Data Schemas
 
 ```typescript
 interface ReportFile {
@@ -336,7 +427,7 @@ interface ProgressDataPoint {
 }
 ```
 
-### 6.5 AI Extraction Interface
+### 7.5 AI Extraction Interface
 
 ```typescript
 async function extractFromReport(
@@ -348,7 +439,7 @@ async function extractFromReport(
 }
 ```
 
-### 6.6 Mock Data for Development
+### 7.6 Mock Data for Development
 
 ```typescript
 const mockProgressData: ProgressDataPoint[] = [
@@ -397,7 +488,7 @@ const mockProgressData: ProgressDataPoint[] = [
 ];
 ```
 
-### 6.7 UI Specifications
+### 7.7 UI Specifications
 
 **Progress Card:**
 - Full-width progress bar (gray background, colored fill)
@@ -412,17 +503,17 @@ const mockProgressData: ProgressDataPoint[] = [
 
 ---
 
-## 7. Module 3: Field Evidence Validation
+## 8. Module 3: Field Evidence Validation
 
-### 7.1 Purpose
+### 8.1 Purpose
 User uploads field evidence (surveys, photos, observation notes). System links evidence to KPIs and shows validation status.
 
-### 7.2 User Flow
+### 8.2 User Flow
 ```
 Upload Evidence Files → Link to KPIs → View Validation Status → Proceed to Stage 4
 ```
 
-### 7.3 Features
+### 8.3 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -437,7 +528,7 @@ Upload Evidence Files → Link to KPIs → View Validation Status → Proceed to
 | M3-F9 | Add Notes | Free text field for each evidence item | Should Have |
 | M3-F10 | Proceed Button | Enabled when at least 1 evidence item is uploaded | Must Have |
 
-### 7.4 Data Schemas
+### 8.4 Data Schemas
 
 ```typescript
 interface EvidenceFile {
@@ -466,7 +557,7 @@ interface ValidationResult {
 }
 ```
 
-### 7.5 Mock Data for Development
+### 8.5 Mock Data for Development
 
 ```typescript
 const mockEvidenceFiles: EvidenceFile[] = [
@@ -524,7 +615,7 @@ const mockValidationResults: ValidationResult[] = [
 ];
 ```
 
-### 7.6 UI Specifications
+### 8.6 UI Specifications
 
 **Evidence Card:**
 - White card with left border (color by type: blue=survey, green=photo, gray=document)
@@ -535,17 +626,17 @@ const mockValidationResults: ValidationResult[] = [
 
 ---
 
-## 8. Module 4: SROI Calculation
+## 9. Module 4: SROI Calculation
 
-### 8.1 Purpose
+### 9.1 Purpose
 Calculate Social Return on Investment with full transparency. User inputs investment amount, system shows step-by-step calculation with adjustable factors.
 
-### 8.2 User Flow
+### 9.2 User Flow
 ```
 View Outcomes Summary → Input Investment → Adjust Factors (optional) → View Calculation → Proceed to Stage 5
 ```
 
-### 8.3 Features
+### 10.3 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -560,7 +651,7 @@ View Outcomes Summary → Input Investment → Adjust Factors (optional) → Vie
 | M4-F9 | Plain English Summary | "Every ₹1 invested created ₹X.XX of social value" | Must Have |
 | M4-F10 | Proceed Button | Always enabled (calculation is automatic) | Must Have |
 
-### 8.4 Data Schemas
+### 9.4 Data Schemas
 
 ```typescript
 interface OutcomeItem {
@@ -588,7 +679,7 @@ interface SROICalculation {
 }
 ```
 
-### 8.5 SROI Calculation Logic
+### 9.5 SROI Calculation Logic
 
 ```typescript
 function calculateSROI(
@@ -615,7 +706,7 @@ function calculateSROI(
 }
 ```
 
-### 8.6 Mock Data for Development
+### 9.6 Mock Data for Development
 
 ```typescript
 const mockOutcomes: OutcomeItem[] = [
@@ -644,7 +735,7 @@ const defaultAdjustments: AdjustmentFactors = {
 };
 ```
 
-### 8.7 UI Specifications
+### 9.7 UI Specifications
 
 **SROI Display:**
 - Large number (48-64px font) in colored box
@@ -663,17 +754,17 @@ const defaultAdjustments: AdjustmentFactors = {
 
 ---
 
-## 9. Module 5: Report Generation
+## 10. Module 5: Report Generation
 
-### 9.1 Purpose
+### 10.1 Purpose
 Generate a professional PDF report compiling all data from previous modules.
 
-### 9.2 User Flow
+### 10.2 User Flow
 ```
 View Report Preview → Download PDF
 ```
 
-### 9.3 Features
+### 10.3 Features
 
 | Feature ID | Feature | Description | Priority |
 |------------|---------|-------------|----------|
@@ -686,7 +777,7 @@ View Report Preview → Download PDF
 | M5-F7 | Download PDF | Generate and download as PDF | Must Have |
 | M5-F8 | Regenerate Option | Button to regenerate if user went back and changed data | Should Have |
 
-### 9.4 Report Structure
+### 10.4 Report Structure
 
 ```
 1. Cover Page
@@ -723,7 +814,7 @@ View Report Preview → Download PDF
    - Summary statement
 ```
 
-### 9.5 UI Specifications
+### 10.5 UI Specifications
 
 **Preview Container:**
 - Scrollable preview area with page-like appearance
@@ -737,9 +828,9 @@ View Report Preview → Download PDF
 
 ---
 
-## 10. Design System
+## 11. Design System
 
-### 10.1 Color Palette
+### 11.1 Color Palette
 
 | Name | Hex | Usage |
 |------|-----|-------|
@@ -757,7 +848,7 @@ View Report Preview → Download PDF
 | Red | #EF4444 | Error states |
 | Green | #22C55E | Success indicators |
 
-### 10.2 Typography
+### 11.2 Typography
 
 | Element | Font | Size | Weight |
 |---------|------|------|--------|
@@ -768,7 +859,7 @@ View Report Preview → Download PDF
 | Small Text | System Sans | 12px | Regular |
 | Caption | System Sans | 11px | Regular |
 
-### 10.3 Spacing
+### 11.3 Spacing
 
 - Page padding: 24px (desktop), 16px (tablet)
 - Card padding: 20px
@@ -776,7 +867,7 @@ View Report Preview → Download PDF
 - Element gap: 16px
 - Tight gap: 8px
 
-### 10.4 Components to Use (shadcn/ui)
+### 11.4 Components to Use (shadcn/ui)
 
 - Button (primary, secondary, ghost variants)
 - Card
@@ -791,7 +882,7 @@ View Report Preview → Download PDF
 
 ---
 
-## 11. File Structure Recommendation
+## 12. File Structure Recommendation
 
 ```
 /app
@@ -799,8 +890,13 @@ View Report Preview → Download PDF
   /layout.tsx               # Root layout with providers
   
 /components
+  /dashboard
+    /ProjectDashboard.tsx   # Landing page — project list
+    /ProjectCard.tsx        # Individual project card
+    /CreateProjectDialog.tsx # New project creation dialog
+
   /shell
-    /AppShell.tsx           # Main layout wrapper
+    /AppShell.tsx           # Main layout wrapper (per project)
     /StageStepper.tsx       # Navigation stepper
     /StageContainer.tsx     # Container for stage content
     
@@ -847,7 +943,7 @@ View Report Preview → Download PDF
 
 ---
 
-## 12. Development Phases
+## 13. Development Phases
 
 ### Phase 1: Foundation (Day 1)
 - [ ] Set up Next.js project with Tailwind + shadcn/ui
@@ -900,40 +996,43 @@ View Report Preview → Download PDF
 
 ---
 
-## 13. Success Criteria
+## 14. Success Criteria
 
 The MVP is complete when:
 
-1. **End-to-end flow works:** User can upload sample MoU → See extracted KPIs → Upload sample reports → See progress dashboard → Upload sample evidence → See validation → View SROI calculation → Download PDF report
+1. **Multi-project works:** User can create multiple projects from the dashboard, open any project, and each has independent data
 
-2. **Professional appearance:** UI looks polished enough for an exhibition demo
+2. **End-to-end flow works per project:** User can upload sample MoU → See extracted KPIs → Upload sample reports → See progress dashboard → Upload sample evidence → See validation → View SROI calculation → Download PDF report
 
-3. **Data flows correctly:** Changes in earlier stages reflect in later stages
+3. **Professional appearance:** UI looks polished enough for an exhibition demo
 
-4. **Works offline-capable:** Core functionality works without internet (except AI extraction which is stubbed)
+4. **Data flows correctly:** Changes in earlier stages reflect in later stages, within each project
 
-5. **Deployable:** Running on Vercel with stable URL
+5. **Project isolation:** Each project's data is independent — editing one project does not affect another
+
+6. **Works offline-capable:** Core functionality works without internet using Ollama fallback
+
+7. **Deployable:** Running on Vercel with stable URL
 
 ---
 
-## 14. Out of Scope for MVP
+## 15. Out of Scope for MVP
 
 The following are explicitly NOT included in this MVP:
 
 - User authentication / login
-- Database / persistent storage
-- Multiple projects
-- Real AI document extraction (stubbed)
+- Database / persistent storage (uses LocalStorage)
 - Edit history / versioning
 - Export to formats other than PDF
 - Email / sharing functionality
 - Mobile-optimized UI (tablet minimum)
 - Multi-language support
 - Accessibility audit (basic only)
+- Cross-project reporting / portfolio-level analytics
 
 ---
 
-## 15. Appendix: Sample Data Files
+## 16. Appendix: Sample Data Files
 
 > **Note to Technical Agent:** 
 > We can provide sample PDF files (MoU, NGO reports) for testing if needed. Let us know if you want these created, or if the mock data in code is sufficient for MVP development.

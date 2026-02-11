@@ -12,7 +12,7 @@ Each step pulls from specific documents. This is how the four docs work together
 
 | Document | Role | Used Primarily In |
 |----------|------|-------------------|
-| **PRD** | *What* to build (features, data schemas, user flows) | Steps 4–8 (each module) |
+| **PRD** | *What* to build (features, data schemas, user flows) | Step 3 (dashboard), Steps 4–8 (each module) |
 | **Technical Architecture** | *How* it connects (store, API routes, providers, data flow) | Steps 1–2 (setup), Steps 4–8 (wiring) |
 | **UI/UX Strategy** | *How it looks and feels* (colors, typography, animations, component styling) | Step 1 (design tokens), Step 3 (base components), Step 9 (verification) |
 | **Master Task List** | *Tracking progress* (this document) | Every step |
@@ -25,8 +25,8 @@ Step 1:  UI/UX Strategy → tailwind.config.ts (design tokens: colors, fonts, sh
                         → Install framer-motion
          Result: Every component built after this automatically uses the right colors/fonts/spacing.
 
-Step 3:  UI/UX Strategy → AppShell, StageStepper, Buttons, Cards (base component styling)
-         Result: All modules reuse these styled base components. The "premium look" is built-in.
+Step 3:  UI/UX Strategy → ProjectDashboard, ProjectCard, AppShell, StageStepper, Buttons, Cards
+         Result: Dashboard + all modules reuse these styled base components. The "premium look" is built-in.
 
 Steps 4–8: Components inherit design tokens + reuse base components.
            Animations added per UI/UX Strategy animation catalog.
@@ -47,7 +47,7 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 |------|------|--------|---------|-----------|
 | 1 | Project Setup + Deployment Pipeline + Design Foundation | Not Started | — | — |
 | 2 | AI Extraction Infrastructure | Not Started | — | — |
-| 3 | App Shell + Base Components (Module 0) | Not Started | — | — |
+| 3 | Project Dashboard + App Shell + Base Components (Module 0) | Not Started | — | — |
 | 4 | Module 1 — MoU Upload | Not Started | — | — |
 | 5 | Module 2 — Progress Reports | Not Started | — | — |
 | 6 | Module 3 — Field Evidence | Not Started | — | — |
@@ -71,8 +71,8 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 1.6 | Install Framer Motion | Not Started | For animations (UI/UX Strategy §6) |
 | 1.7 | Configure `tailwind.config.ts` with design tokens | Not Started | Colors, spacing, shadows from UI/UX Strategy §2, §4.2, §4.3 |
 | 1.8 | Configure `globals.css` with CSS variables + font imports | Not Started | Plus Jakarta Sans + Inter (UI/UX Strategy §3) |
-| 1.9 | Create `lib/types.ts` (all TypeScript interfaces) | Not Started | |
-| 1.10 | Create `lib/store.ts` (empty slices with persist) | Not Started | |
+| 1.9 | Create `lib/types.ts` (all TypeScript interfaces including Project) | Not Started | Project entity wraps all module data |
+| 1.10 | Create `lib/store.ts` (multi-project store with persist) | Not Started | projects[], activeProjectId, view state |
 | 1.11 | Create `.env.local` with placeholder values | Not Started | |
 | 1.12 | Create basic landing page (app name + placeholder) | Not Started | Use navy header + teal accent as first visual test |
 | 1.13 | Connect GitHub repo to Vercel | Not Started | |
@@ -105,30 +105,43 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 
 ---
 
-## Step 3: App Shell + Base Components (Module 0)
+## Step 3: Project Dashboard + App Shell + Base Components (Module 0)
 
-**Docs referenced:** PRD (§4 App Shell) + Technical Architecture (§5 State) + UI/UX Strategy (§4 Layout, §5 Component Styling, §6 Animations)
+**Docs referenced:** PRD (§4 Dashboard, §5 App Shell) + Technical Architecture (§5 State, §9 Routing) + UI/UX Strategy (§4 Layout, §5 Component Styling, §6 Animations)
 
-This is where the premium visual identity gets built into reusable components.
+This is where the multi-project dashboard and premium visual identity get built into reusable components.
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 3.1 | Create `AppShell.tsx` — navy header, max-width content, sticky top | Not Started | UI/UX §5.1: Navy #0F172A, 64px height, logo + app name |
-| 3.2 | Create `StageStepper.tsx` — 5-step horizontal stepper | Not Started | UI/UX §5.2: Colored circles, connector lines, pulse animation on current |
-| 3.3 | Create `StageContainer.tsx` — stage content wrapper with title + nav buttons | Not Started | UI/UX §4.1: Layout structure, back/continue buttons |
-| 3.4 | Create `AIStatusIndicator.tsx` — provider status badge in header | Not Started | UI/UX §4.7 from Tech Arch: Green/Blue/Red dot |
-| 3.5 | Style base shadcn/ui Button variants (primary, secondary, danger) | Not Started | UI/UX §5.3: Teal primary, hover/active states, 200ms transition |
-| 3.6 | Style base shadcn/ui Card variants (standard, elevated, dark) | Not Started | UI/UX §4.3: Three card tiers with correct shadows/borders |
-| 3.7 | Style base Badge component (on-track, at-risk, behind, etc.) | Not Started | UI/UX §5.8: All status badge variants |
-| 3.8 | Create reusable UploadZone component (shared by Stages 1, 2, 3) | Not Started | UI/UX §5.4: Dashed border, hover/drag states, processing state |
-| 3.9 | Set up Framer Motion page transition wrapper | Not Started | UI/UX §6.3: Slide left/right + fade between stages |
-| 3.10 | Create skeleton loading component | Not Started | UI/UX §7.1: Gray shimmer blocks, 1.5s pulse cycle |
-| 3.11 | Implement navigation logic in store (currentStage, goToStage, etc.) | Not Started | |
-| 3.12 | Implement stage locking logic | Not Started | |
-| 3.13 | Add reset functionality | Not Started | |
-| 3.14 | Responsive layout testing (desktop + tablet) | Not Started | UI/UX §9: 1200px max-width, tablet stacking |
-| 3.15 | Push → verify deployment | Not Started | |
-| | **CHECKPOINT:** Live URL shows premium-styled app shell with animated stepper, correct fonts, navy header | | |
+| | **Project Dashboard** | | |
+| 3.1 | Create `ProjectDashboard.tsx` — landing page with project list | Not Started | UI/UX §5.0: Grid layout, "Your Projects" heading, "+ New Project" button |
+| 3.2 | Create `ProjectCard.tsx` — project card with stage progress + status | Not Started | UI/UX §5.0: Left accent bar by stage, mini stage indicator, hover elevation |
+| 3.3 | Create `CreateProjectDialog.tsx` — new project creation dialog | Not Started | UI/UX §5.0: Modal with optional name input |
+| 3.4 | Implement dashboard empty state (no projects yet) | Not Started | UI/UX §5.0: Icon, heading, "Create New Project" CTA |
+| 3.5 | Implement delete project with confirmation dialog | Not Started | |
+| 3.6 | Implement two-level navigation (dashboard ↔ project) | Not Started | Tech Arch §9: view state, openProject(), goToDashboard() |
+| 3.7 | Project card stagger animation | Not Started | UI/UX §6.2: 500ms, staggered 80ms |
+| | **App Shell (per project)** | | |
+| 3.8 | Create `AppShell.tsx` — navy header with project name + "← Back" link | Not Started | UI/UX §5.1: Navy #0F172A, 64px height, project name in header |
+| 3.9 | Create `StageStepper.tsx` — 5-step horizontal stepper | Not Started | UI/UX §5.2: Colored circles, connector lines, pulse animation on current |
+| 3.10 | Create `StageContainer.tsx` — stage content wrapper with title + nav buttons | Not Started | UI/UX §4.1: Layout structure, back/continue buttons |
+| 3.11 | Create `AIStatusIndicator.tsx` — provider status badge in header | Not Started | Tech Arch §4.7: Green/Blue/Red dot |
+| | **Base Components** | | |
+| 3.12 | Style base shadcn/ui Button variants (primary, secondary, danger) | Not Started | UI/UX §5.3: Teal primary, hover/active states, 200ms transition |
+| 3.13 | Style base shadcn/ui Card variants (standard, elevated, dark) | Not Started | UI/UX §4.3: Three card tiers with correct shadows/borders |
+| 3.14 | Style base Badge component (on-track, at-risk, behind, etc.) | Not Started | UI/UX §5.8: All status badge variants |
+| 3.15 | Create reusable UploadZone component (shared by Stages 1, 2, 3) | Not Started | UI/UX §5.4: Dashed border, hover/drag states, processing state |
+| 3.16 | Set up Framer Motion transition wrappers (dashboard ↔ project + stage transitions) | Not Started | UI/UX §6.2-6.3: Dashboard transition + slide left/right between stages |
+| 3.17 | Create skeleton loading component | Not Started | UI/UX §7.1: Gray shimmer blocks, 1.5s pulse cycle |
+| | **Store Logic** | | |
+| 3.18 | Implement project management in store (createProject, deleteProject, openProject, goToDashboard) | Not Started | |
+| 3.19 | Implement per-project navigation (currentStage, goToStage, nextStage, prevStage) | Not Started | |
+| 3.20 | Implement stage locking logic (per project) | Not Started | |
+| 3.21 | Add reset project functionality | Not Started | |
+| | **Testing** | | |
+| 3.22 | Responsive layout testing (desktop + tablet) | Not Started | UI/UX §9: 1200px max-width, tablet stacking |
+| 3.23 | Push → verify deployment | Not Started | |
+| | **CHECKPOINT:** Live URL shows project dashboard, can create project, enter 5-stage shell with animated stepper, correct fonts, navy header | | |
 
 ---
 
@@ -271,16 +284,20 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 | 9.15 | Verify skeleton loading screens on all async operations | Not Started | |
 | 9.16 | Verify empty states for each stage | Not Started | |
 | 9.17 | Verify error states and error messages | Not Started | |
+| | **Multi-Project Testing** | | |
+| 9.18 | Verify creating, opening, and deleting multiple projects | Not Started | |
+| 9.19 | Verify project data isolation (editing one doesn't affect another) | Not Started | |
+| 9.20 | Verify dashboard updates when project data changes | Not Started | |
 | | **Functional Testing** | | |
-| 9.18 | Responsive testing (desktop + tablet 768px) | Not Started | |
-| 9.19 | AI failover testing (online → offline → back) | Not Started | |
-| 9.20 | Test with real MoU PDF | Not Started | |
-| 9.21 | Test with real NGO report PDF | Not Started | |
-| 9.22 | Test with real evidence files (CSV, images) | Not Started | |
+| 9.21 | Responsive testing (desktop + tablet 768px) | Not Started | |
+| 9.22 | AI failover testing (online → offline → back) | Not Started | |
+| 9.23 | Test with real MoU PDF | Not Started | |
+| 9.24 | Test with real NGO report PDF | Not Started | |
+| 9.25 | Test with real evidence files (CSV, images) | Not Started | |
 | | **Deployment** | | |
-| 9.23 | Ollama setup documentation | Not Started | |
-| 9.24 | Production build + local run test | Not Started | |
-| 9.25 | Final push → verify deployment | Not Started | |
+| 9.26 | Ollama setup documentation | Not Started | |
+| 9.27 | Production build + local run test | Not Started | |
+| 9.28 | Final push → verify deployment | Not Started | |
 | | **CHECKPOINT:** Production-ready on Vercel + tested offline + all UI/UX verified | | |
 
 ---
@@ -306,6 +323,11 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 | 7 | Feb 11 | Framer Motion for animations | Industry standard, polished transitions for exhibition impact |
 | 8 | Feb 11 | Plus Jakarta Sans + Inter fonts | Premium heading font + reliable body font |
 | 9 | Feb 11 | UI/UX baked into code at Step 1 | Design tokens in Tailwind config, not a separate reference doc |
+| 10 | Feb 11 | **npm** as package manager | Zero extra setup, universal compatibility, all Next.js/Vercel/shadcn docs assume npm |
+| 11 | Feb 11 | **Claude Sonnet 4.5** as primary AI model | Best balance of speed, quality, and cost for document extraction |
+| 12 | Feb 11 | **Mistral 7B** as Ollama fallback model | Best JSON compliance, lighter RAM (~6GB vs 8GB), faster responses, reliable for exhibition demos |
+| 13 | Feb 11 | **Lightweight SVG** for sparkline charts | Zero bundle cost (~30 lines vs 45KB Recharts), Framer Motion compatible, full design system control. Recharts can be evaluated post-MVP if complex visualizations are needed |
+| 14 | Feb 11 | **Multi-project support** in MVP | Users need to manage multiple CSR projects from a single dashboard. Each project has independent 5-stage pipeline. Data scoped by project ID in Zustand store, persisted to LocalStorage. Moved from "Out of Scope" to core MVP feature. |
 
 ---
 

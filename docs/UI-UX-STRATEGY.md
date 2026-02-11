@@ -1,7 +1,7 @@
 # UI/UX Strategy Document
 ## CSR Impact Assessment Platform — MVP
 
-**Version:** 1.0
+**Version:** 2.0
 **Date:** February 11, 2026
 **Visual Style:** Corporate Premium
 **Display Target:** Laptop screen (exhibition booth, close viewing)
@@ -108,13 +108,43 @@ Both fonts are available via Google Fonts / `next/font` — zero layout shift, l
 
 ## 4. Layout System
 
-### 4.1 Page Structure
+### 4.1 Two-Level Layout
 
+The app has two distinct layouts:
+
+**Level 1 — Project Dashboard** (landing page):
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │  HEADER BAR (navy #0F172A)                             h: 64px  │
 │  ┌──────────┐                              ┌────────────────┐   │
 │  │   Logo   │    CSR Impact Assessment     │ AI: Cloud ●    │   │
+│  └──────────┘                              └────────────────┘   │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  DASHBOARD CONTENT                    max-w: 1200px, centered   │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │                                                            │  │
+│  │  Your Projects                    [+ New Project] button  │  │
+│  │  X projects                                                │  │
+│  │                                                            │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │  │
+│  │  │ Project A    │  │ Project B    │  │ Project C    │   │  │
+│  │  │ NGO Name     │  │ NGO Name     │  │ NGO Name     │   │  │
+│  │  │ ●●●○○ Stg 3 │  │ ●○○○○ Stg 1 │  │ ●●●●● Done  │   │  │
+│  │  │ Updated 2d   │  │ Updated 1h   │  │ SROI: 3.2x  │   │  │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘   │  │
+│  │                                                            │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                   │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Level 2 — Project View** (5-stage flow):
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  HEADER BAR (navy #0F172A)                             h: 64px  │
+│  ┌──────────┐                              ┌────────────────┐   │
+│  │ ← Back   │    Project Name              │ AI: Cloud ●    │   │
 │  └──────────┘                              └────────────────┘   │
 ├──────────────────────────────────────────────────────────────────┤
 │  STAGE STEPPER                                         h: 80px  │
@@ -141,6 +171,10 @@ Both fonts are available via Google Fonts / `next/font` — zero layout shift, l
 │                                                                   │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+Key differences in Level 2 header:
+- Logo area replaced with "← Back to Projects" link
+- App name replaced with the current project name
 
 ### 4.2 Spacing System
 
@@ -189,6 +223,64 @@ Cards are the primary content containers. Three tiers:
 ---
 
 ## 5. Component Styling Guide
+
+### 5.0 Project Dashboard
+
+**Dashboard Header Area:**
+```
+- "Your Projects" heading: 28px Plus Jakarta Sans bold, #0F172A
+- Project count subtitle: 14px Inter, #64748B (e.g., "3 projects")
+- "+ New Project" button: Primary teal button, right-aligned
+```
+
+**Project Card:**
+```
+- White card, 12px border radius, standard shadow
+- Left accent bar: 4px wide, colored by furthest completed stage:
+  - Not started: #CBD5E1 (gray)
+  - Stage 1: #0891B2 (teal)
+  - Stage 2: #059669 (emerald)
+  - Stage 3: #2563EB (blue)
+  - Stage 4: #D97706 (gold)
+  - Stage 5 complete: #7C3AED (purple)
+- Padding: 20px
+- Top line: Project name (16px semibold) + delete icon (appears on hover, muted)
+- Second line: NGO name (14px, #64748B muted)
+- Middle: Mini stage indicator — 5 small circles (8px) showing stage completion
+  - Completed: solid stage color
+  - Current: stage color with pulse
+  - Locked: gray outline
+- Bottom row: "Updated 2h ago" (12px caption, #94A3B8) + SROI badge if available
+- Hover: Shadow increases, cursor pointer, slight scale 1.01
+- Click: Opens the project (transition to Level 2)
+- Animate in: Staggered slide-up + fadeIn (same pattern as KPI cards)
+```
+
+**Grid Layout:**
+```
+- Desktop (>1024px): 3 columns, 16px gap
+- Tablet (768-1024px): 2 columns, 16px gap
+- Narrow: 1 column
+```
+
+**Empty State (no projects):**
+```
+- Centered vertically in content area
+- Large folder/document icon (64px, #94A3B8)
+- "No projects yet" — 22px Plus Jakarta Sans semibold, #0F172A
+- "Create your first CSR impact assessment" — 14px Inter, #64748B
+- Primary CTA: "Create New Project" button (teal, centered)
+- Animate in: fadeIn + slight scale-up (400ms)
+```
+
+**Create Project Dialog:**
+```
+- Modal overlay with backdrop blur
+- White card, 16px border radius, elevated shadow
+- Title: "New Project" — 20px semibold
+- Optional: Project name input (can be auto-filled from MoU later)
+- Buttons: "Cancel" (secondary) + "Create" (primary teal)
+```
 
 ### 5.1 Header Bar
 
@@ -345,6 +437,8 @@ Use **Framer Motion** for React-based animations. It provides:
 
 | Animation | Where Used | Duration | Easing |
 |-----------|-----------|----------|--------|
+| **Dashboard ↔ Project transition** | Opening/closing a project from dashboard | 400ms | easeInOut |
+| **Project card stagger** | Project cards appearing on dashboard | 500ms, staggered 80ms | easeOut (spring) |
 | **Page/Stage transition** | Switching between stages | 400ms | easeInOut |
 | **Card slide-up + fade** | KPI cards appearing after extraction | 500ms, staggered 100ms | easeOut (spring) |
 | **Progress bar fill** | Progress cards in Stage 2 | 800ms | easeOutCubic |

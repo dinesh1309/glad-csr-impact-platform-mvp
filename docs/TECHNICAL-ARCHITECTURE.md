@@ -1,7 +1,7 @@
 # Technical Architecture Document
 ## CSR Impact Assessment Platform — MVP
 
-**Version:** 2.0
+**Version:** 3.0
 **Date:** February 2026
 **Status:** Draft — Pending Review
 
@@ -95,8 +95,9 @@ The application is built with **Next.js (App Router)** running in **server mode*
 1. **Offline-first for exhibition** — The app must function fully without internet. Ollama provides local AI extraction. Claude API is used when internet is available for better quality.
 2. **Automatic failover** — The extraction service checks connectivity and silently switches between Claude API and Ollama. The user never sees this switch.
 3. **Single source of state** — Zustand store holds all application data. Components subscribe to the slices they need.
-4. **Sequential stage flow** — Users progress linearly (1→2→3→4→5) with ability to go back. Stage locking is enforced at the store level.
-5. **Real AI extraction** — All document extraction (MoU, reports, evidence) uses actual AI, not mock data. Users can upload their own documents and get real results.
+4. **Multi-project architecture** — Users manage multiple projects from a dashboard. Each project has its own independent 5-stage pipeline. All project data is scoped by project ID.
+5. **Sequential stage flow** — Within each project, users progress linearly (1→2→3→4→5) with ability to go back. Stage locking is enforced at the store level.
+6. **Real AI extraction** — All document extraction (MoU, reports, evidence) uses actual AI, not mock data. Users can upload their own documents and get real results.
 6. **Server mode required** — Next.js runs with API routes (not static export) because AI calls happen server-side to protect API keys and handle Ollama communication.
 
 ---
@@ -224,9 +225,10 @@ The UI shows a small connectivity indicator (green/yellow/red dot) so the presen
 
 ### Q5: Data Persistence → **LocalStorage via Zustand Persist**
 
-- Zustand's `persist` middleware auto-syncs state to LocalStorage
-- Data survives page refreshes and browser restarts
-- "Reset" button clears LocalStorage and resets store to initial state
+- Zustand's `persist` middleware auto-syncs the entire `projects[]` array to LocalStorage
+- All projects and their data survive page refreshes and browser restarts
+- "Reset Project" button clears data for a single project
+- "Delete Project" removes a project entirely from the store and LocalStorage
 - File blobs (PDFs, images) are **not** persisted — only metadata and extracted values are stored
 - This is sufficient for a demo/exhibition context
 
@@ -250,8 +252,13 @@ glad-csr-impact-platform-mvp/
 │       └── health/route.ts       # GET: Check AI provider availability
 │
 ├── components/
+│   ├── dashboard/
+│   │   ├── ProjectDashboard.tsx  # Landing page: project list + create new
+│   │   ├── ProjectCard.tsx       # Individual project card with status summary
+│   │   └── CreateProjectDialog.tsx # Dialog for creating a new project
+│   │
 │   ├── shell/
-│   │   ├── AppShell.tsx          # Main layout: header + stepper + content area
+│   │   ├── AppShell.tsx          # Main layout: header + stepper + content area (per project)
 │   │   ├── StageStepper.tsx      # Horizontal 5-step progress indicator
 │   │   ├── StageContainer.tsx    # Wrapper for stage content with title/description
 │   │   └── AIStatusIndicator.tsx # Small dot showing Claude/Ollama/offline status
@@ -450,59 +457,76 @@ This is polled every 30 seconds via `GET /api/health` and helps the exhibition p
 
 ## 5. State Management Architecture
 
-### 5.1 Zustand Store — Slice Pattern
+### 5.1 Zustand Store — Multi-Project Architecture
 
-The store is organized into slices matching each module. Each slice owns its data and the actions that modify it.
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                     Zustand Store                         │
-│                                                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │  Navigation  │  │   MoU Slice  │  │ Reports Slice│  │
-│  │    Slice     │  │  (Stage 1)   │  │  (Stage 2)   │  │
-│  │              │  │              │  │              │  │
-│  │ currentStage │  │ fileName     │  │ files[]      │  │
-│  │ goToStage()  │  │ projectInfo  │  │ progressData │  │
-│  │ canProceed() │  │ kpis[]       │  │ addReport()  │  │
-│  │ nextStage()  │  │ isConfirmed  │  │ updateKPI()  │  │
-│  │ prevStage()  │  │ setProject() │  │              │  │
-│  │ reset()      │  │ confirmMoU() │  │              │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-│                                                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │Evidence Slice│  │  SROI Slice  │  │ Report Slice │  │
-│  │  (Stage 3)   │  │  (Stage 4)   │  │  (Stage 5)   │  │
-│  │              │  │              │  │              │  │
-│  │ files[]      │  │ investment   │  │ generatedAt  │  │
-│  │ validations[]│  │ outcomes[]   │  │ pdfBlob      │  │
-│  │ addEvidence()│  │ adjustments  │  │ generate()   │  │
-│  │ linkToKPI()  │  │ sroiRatio    │  │              │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-│                                                           │
-│  ┌──────────────────────────────────────────────────────┐│
-│  │           Zustand Persist Middleware                  ││
-│  │           → Syncs to LocalStorage                    ││
-│  │           → Excludes: pdfBlob, file objects          ││
-│  └──────────────────────────────────────────────────────┘│
-└──────────────────────────────────────────────────────────┘
-```
-
-### 5.2 Stage Progression Logic
+The store manages multiple projects. Each project contains its own module data organized into slices. A top-level `projects` slice manages the project list and active project selection.
 
 ```
-Stage 1 → Complete when: mou.isConfirmed === true
-Stage 2 → Complete when: reports.progressData.length > 0
-Stage 3 → Complete when: evidence.files.length > 0
-Stage 4 → Complete when: sroi.calculatedRatio !== null (auto-completes)
+┌──────────────────────────────────────────────────────────────┐
+│                        Zustand Store                          │
+│                                                               │
+│  ┌──────────────────────────────────────────────────────────┐│
+│  │                   Projects Slice (Top Level)              ││
+│  │                                                           ││
+│  │  projects: Project[]       # All project data             ││
+│  │  activeProjectId: string | null  # null = dashboard view  ││
+│  │  view: 'dashboard' | 'project'   # Current screen         ││
+│  │                                                           ││
+│  │  createProject()    # Add new project, set as active       ││
+│  │  deleteProject(id)  # Remove project + data                ││
+│  │  openProject(id)    # Set activeProjectId, view='project'  ││
+│  │  goToDashboard()    # Set activeProjectId=null, view='dash'││
+│  │  getActiveProject() # Helper: returns current project data  ││
+│  └──────────────────────────────────────────────────────────┘│
+│                                                               │
+│  ┌──────────────────────────────────────────────────────────┐│
+│  │          Per-Project Data (inside each Project)           ││
+│  │                                                           ││
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ││
+│  │  │  Navigation  │  │   MoU Data   │  │ Reports Data │  ││
+│  │  │              │  │  (Stage 1)   │  │  (Stage 2)   │  ││
+│  │  │ currentStage │  │ fileName     │  │ files[]      │  ││
+│  │  │              │  │ projectInfo  │  │ progressData │  ││
+│  │  │              │  │ kpis[]       │  │              │  ││
+│  │  │              │  │ isConfirmed  │  │              │  ││
+│  │  └──────────────┘  └──────────────┘  └──────────────┘  ││
+│  │                                                           ││
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ││
+│  │  │Evidence Data │  │  SROI Data   │  │ Report Data  │  ││
+│  │  │  (Stage 3)   │  │  (Stage 4)   │  │  (Stage 5)   │  ││
+│  │  │ files[]      │  │ investment   │  │ generatedAt  │  ││
+│  │  │ validations[]│  │ outcomes[]   │  │ pdfBlob      │  ││
+│  │  │              │  │ adjustments  │  │              │  ││
+│  │  │              │  │ sroiRatio    │  │              │  ││
+│  │  └──────────────┘  └──────────────┘  └──────────────┘  ││
+│  └──────────────────────────────────────────────────────────┘│
+│                                                               │
+│  ┌──────────────────────────────────────────────────────────┐│
+│  │           Zustand Persist Middleware                      ││
+│  │           → Syncs all projects to LocalStorage            ││
+│  │           → Excludes: pdfBlob, file objects               ││
+│  └──────────────────────────────────────────────────────────┘│
+└──────────────────────────────────────────────────────────────┘
+```
+
+**Store actions for project-scoped operations** (e.g., `setProjectDetails`, `addKPI`, `addReport`) all operate on the active project. They find the project by `activeProjectId` and update its data in the `projects[]` array.
+
+### 5.2 Stage Progression Logic (Per Project)
+
+```
+Stage 1 → Complete when: project.mou.isConfirmed === true
+Stage 2 → Complete when: project.reports.progressData.length > 0
+Stage 3 → Complete when: project.evidence.files.length > 0
+Stage 4 → Complete when: project.sroi.calculatedRatio !== null (auto-completes)
 Stage 5 → Final stage, always accessible once Stage 4 is reached
 ```
 
 **Rules:**
-- `currentStage` determines which stage the user sees
+- `project.currentStage` determines which stage the user sees within a project
 - User can go back to any stage <= currentStage
 - User cannot skip forward past the next incomplete stage
 - Going back and editing data in an earlier stage does NOT reset later stages (data carries forward), but the user is shown a warning that downstream data may be affected
+- Each project's stage progression is independent
 
 ---
 
@@ -618,9 +642,14 @@ These are separate component trees because `@react-pdf/renderer` uses its own pr
 
 ## 9. Routing Strategy
 
-### 9.1 Single-Page with API Routes
+### 9.1 Two-Level Navigation with API Routes
 
-The app uses a **single page route** (`/`). Stage navigation is handled through Zustand state (`currentStage`), not URL routes.
+The app uses a **single page route** (`/`) with two-level state-driven navigation:
+
+- **Level 1 — Dashboard**: Shows project list. Active when `view === 'dashboard'`.
+- **Level 2 — Project**: Shows the 5-stage flow for the active project. Active when `view === 'project'` and `activeProjectId` is set.
+
+Stage navigation within a project is handled through Zustand state (`project.currentStage`), not URL routes.
 
 API routes exist only for server-side AI extraction:
 
@@ -631,10 +660,22 @@ API routes exist only for server-side AI extraction:
 | `/api/extract/evidence` | POST | Analyze evidence and validate against KPIs |
 | `/api/health` | GET | Check AI provider availability |
 
-### 9.2 Stage Rendering
+### 9.2 View Rendering
 
 ```tsx
-// Simplified rendering logic in AppShell
+// Simplified rendering logic in page.tsx
+const { view, activeProjectId } = useStore();
+
+if (view === 'dashboard' || !activeProjectId) {
+  return <ProjectDashboard />;
+}
+
+return <AppShell projectId={activeProjectId} />;
+```
+
+```tsx
+// Inside AppShell — stage rendering for active project
+const project = useActiveProject();
 const stages = {
   1: <Stage1MoU />,
   2: <Stage2Reports />,
@@ -643,7 +684,7 @@ const stages = {
   5: <Stage5Report />,
 };
 
-return stages[currentStage];
+return stages[project.currentStage];
 ```
 
 ---
@@ -663,6 +704,9 @@ return stages[currentStage];
 | pdf-parse | ^1.1 | PDF text extraction (for Ollama path) | ~5KB gzip |
 | papaparse | ^5 | CSV parsing | ~7KB gzip |
 | lucide-react | latest | Icons | Tree-shakeable |
+| framer-motion | latest | Animations & transitions | ~32KB gzip |
+
+**Not using a chart library.** Sparkline charts (Stage 2 trend lines) are implemented as lightweight hand-coded SVG components (~30 lines). This saves ~45KB vs Recharts and keeps animations consistent with Framer Motion. Can be revisited post-MVP if complex visualizations are needed.
 
 ### 10.2 shadcn/ui Components (Not a Dependency)
 
@@ -922,8 +966,8 @@ Each step ends with a **commit → push → verify on Vercel** checkpoint. No st
 Step 1: Project Setup + Deployment Pipeline
   ├── Create GitHub repository
   ├── Initialize Next.js + Tailwind + shadcn/ui + Zustand
-  ├── Define types.ts (all TypeScript interfaces)
-  ├── Set up store.ts (empty slices with persist)
+  ├── Define types.ts (all TypeScript interfaces including Project)
+  ├── Set up store.ts (multi-project store with persist)
   ├── Set up .env.local with placeholder values
   ├── Create basic landing page (app name + "Coming Soon")
   ├── Connect GitHub repo to Vercel
@@ -943,12 +987,14 @@ Step 2: AI Extraction Infrastructure
   ├── Push → verify Vercel build succeeds
   └── ✅ CHECKPOINT: /api/health returns status on live URL
 
-Step 3: App Shell (Module 0)
+Step 3: Project Dashboard + App Shell (Module 0)
+  ├── ProjectDashboard + ProjectCard + CreateProjectDialog
   ├── AppShell + StageStepper + StageContainer
   ├── AIStatusIndicator component
-  ├── Navigation logic in store
+  ├── Multi-project store (projects[], activeProjectId, view)
+  ├── Two-level navigation (dashboard ↔ project)
   ├── Push → verify deployment
-  └── ✅ CHECKPOINT: Live URL shows app shell with 5-stage stepper
+  └── ✅ CHECKPOINT: Live URL shows project dashboard, can create project and enter 5-stage shell
 
 Step 4: Module 1 (MoU Upload)
   ├── Upload zone → calls /api/extract/mou
@@ -1010,31 +1056,33 @@ These are **not built** in MVP but the architecture accommodates them:
 |---------|------------------------------|
 | Better AI models | Swap model name in .env.local or provider config. No code changes. |
 | Database persistence | Replace Zustand persist (LocalStorage) with API calls. Store interface stays the same. |
-| Multi-project support | Add a project selector and scope the store by project ID. |
 | Authentication | Add Next.js middleware + auth provider wrapping the app. |
 | Real-time collaboration | Replace Zustand with a synced store (e.g., Liveblocks). |
 | Caching extractions | Add a cache layer in the API routes to avoid re-processing the same document. |
+| Portfolio analytics | Add a cross-project view that aggregates SROI and progress data from all projects. |
 
 ---
 
-## 17. Open Decisions / Assumptions
+## 17. Confirmed Decisions & Assumptions
 
-| # | Item | Assumption | Needs Confirmation? |
-|---|------|------------|---------------------|
-| 1 | Node.js version | 18+ (LTS) | No |
-| 2 | Package manager | npm | Yes — prefer npm or pnpm? |
-| 3 | Next.js version | 14 (App Router) | No |
-| 4 | Ollama model | Mistral 7B (default) | Yes — or prefer llama3? |
-| 5 | Claude model | claude-sonnet-4-5 (cost-effective) | Yes — or claude-opus-4-6 for max quality? |
-| 6 | Currency | Indian Rupees (INR) throughout | No |
-| 7 | Sparkline charts (Module 2) | Lightweight SVG, no chart library | Yes — or add recharts? |
-| 8 | Exhibition hardware | Unknown — architecture supports 8GB+ RAM | Pending |
-| 9 | Connectivity check interval | Every 30 seconds | No |
+| # | Item | Decision | Status |
+|---|------|----------|--------|
+| 1 | Node.js version | 18+ (LTS) | Confirmed |
+| 2 | Package manager | **npm** — zero extra setup, universal compatibility, all docs/tutorials assume it | Confirmed |
+| 3 | Next.js version | 14 (App Router) | Confirmed |
+| 4 | Ollama model | **Mistral 7B** — best JSON compliance, lighter RAM (~6GB), faster responses. Reliable fallback for exhibition demos. | Confirmed |
+| 5 | Claude model | **Claude Sonnet 4.5** (`claude-sonnet-4-5-20250929`) — best balance of speed, quality, and cost for document extraction | Confirmed |
+| 6 | Currency | Indian Rupees (INR) throughout | Confirmed |
+| 7 | Sparkline charts (Module 2) | **Lightweight SVG** — hand-coded `<polyline>` component (~30 lines). Zero bundle cost, Framer Motion compatible, full design system control. Recharts can be evaluated post-MVP if more complex visualizations are needed. | Confirmed |
+| 8 | Exhibition hardware | Unknown — architecture supports 8GB+ RAM (Mistral 7B needs ~6GB) | Pending |
+| 9 | Connectivity check interval | Every 30 seconds | Confirmed |
 
 ---
 
-**End of Technical Architecture Document v2**
+**End of Technical Architecture Document v3.0**
 
-*Major change from v1: Real AI extraction with Claude API + Ollama hybrid approach, offline-first exhibition support, Next.js server mode with API routes.*
+*v2 changes: Real AI extraction with Claude API + Ollama hybrid approach, offline-first exhibition support, Next.js server mode with API routes.*
 
-*Ready for review. No code will be written until this architecture is approved.*
+*v2.1 changes: All open decisions resolved — npm, Claude Sonnet 4.5, Mistral 7B, Lightweight SVG for sparklines. Section 17 updated from "Open Decisions" to "Confirmed Decisions." Framer Motion added to dependencies table. Sparkline approach documented.*
+
+*v3.0 changes: Multi-project architecture. Added project dashboard, Project entity wrapping all module data, two-level navigation (dashboard + project), multi-project Zustand store, dashboard components in project structure. Removed "Multi-project support" from Future Considerations (now in scope).*
