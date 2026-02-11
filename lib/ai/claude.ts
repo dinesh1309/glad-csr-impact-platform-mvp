@@ -3,7 +3,11 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic();
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!_client) _client = new Anthropic();
+  return _client;
+}
 
 export interface ClaudeExtractionResult {
   text: string;
@@ -18,7 +22,7 @@ export async function extractWithClaude(
   pdfBase64: string,
   prompt: string
 ): Promise<ClaudeExtractionResult> {
-  const response = await client.messages.create({
+  const response = await getClient().messages.create({
     model: "claude-sonnet-4-5-20250929",
     max_tokens: 4096,
     temperature: 0,
@@ -58,7 +62,7 @@ export async function extractTextWithClaude(
   text: string,
   prompt: string
 ): Promise<ClaudeExtractionResult> {
-  const response = await client.messages.create({
+  const response = await getClient().messages.create({
     model: "claude-sonnet-4-5-20250929",
     max_tokens: 4096,
     temperature: 0,
@@ -88,7 +92,7 @@ export async function checkClaudeHealth(): Promise<{
   const start = Date.now();
   try {
     // Use a minimal request to check connectivity
-    await client.messages.create({
+    await getClient().messages.create({
       model: "claude-sonnet-4-5-20250929",
       max_tokens: 10,
       messages: [{ role: "user", content: "ping" }],

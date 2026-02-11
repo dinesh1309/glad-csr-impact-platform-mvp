@@ -3,7 +3,6 @@
 
 import { extractWithClaude, extractTextWithClaude, checkClaudeHealth } from "./claude";
 import { extractWithOllama, checkOllamaHealth } from "./ollama";
-import { extractTextFromPDF } from "./pdf-parser";
 
 export type ProviderName = "claude" | "ollama";
 
@@ -80,6 +79,7 @@ export async function extractFromPDF(
     if (primary === "claude") {
       return await extractWithClaude(pdfBase64, prompt);
     } else {
+      const { extractTextFromPDF } = await import("./pdf-parser");
       const text = await extractTextFromPDF(pdfBuffer);
       return await extractWithOllama(text, prompt);
     }
@@ -93,6 +93,7 @@ export async function extractFromPDF(
     if (fallback === "claude") {
       return await extractWithClaude(pdfBase64, prompt);
     } else {
+      const { extractTextFromPDF } = await import("./pdf-parser");
       const text = await extractTextFromPDF(pdfBuffer);
       return await extractWithOllama(text, prompt);
     }
