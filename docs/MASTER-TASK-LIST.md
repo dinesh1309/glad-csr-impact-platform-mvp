@@ -2,7 +2,7 @@
 ## CSR Impact Assessment Platform — MVP
 
 **Last Updated:** February 11, 2026
-**Status:** Step 1 — Not Started
+**Status:** Step 2 — Complete
 
 ---
 
@@ -45,8 +45,8 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 
 | Step | Name | Status | Started | Completed |
 |------|------|--------|---------|-----------|
-| 1 | Project Setup + Deployment Pipeline + Design Foundation | Not Started | — | — |
-| 2 | AI Extraction Infrastructure | Not Started | — | — |
+| 1 | Project Setup + Deployment Pipeline + Design Foundation | Done | Feb 11 | Feb 11 |
+| 2 | AI Extraction Infrastructure | Done | Feb 11 | Feb 11 |
 | 3 | Project Dashboard + App Shell + Base Components (Module 0) | Not Started | — | — |
 | 4 | Module 1 — MoU Upload | Not Started | — | — |
 | 5 | Module 2 — Progress Reports | Not Started | — | — |
@@ -64,20 +64,20 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | # | Task | Status | Notes |
 |---|------|--------|-------|
 | 1.1 | Create GitHub repository | Done | github.com/dinesh1309/glad-csr-impact-platform-mvp |
-| 1.2 | Initialize Next.js project with App Router | Not Started | |
-| 1.3 | Install & configure Tailwind CSS | Not Started | |
-| 1.4 | Install & configure shadcn/ui | Not Started | |
-| 1.5 | Install Zustand + persist middleware | Not Started | |
-| 1.6 | Install Framer Motion | Not Started | For animations (UI/UX Strategy §6) |
-| 1.7 | Configure `tailwind.config.ts` with design tokens | Not Started | Colors, spacing, shadows from UI/UX Strategy §2, §4.2, §4.3 |
-| 1.8 | Configure `globals.css` with CSS variables + font imports | Not Started | Plus Jakarta Sans + Inter (UI/UX Strategy §3) |
-| 1.9 | Create `lib/types.ts` (all TypeScript interfaces including Project) | Not Started | Project entity wraps all module data |
-| 1.10 | Create `lib/store.ts` (multi-project store with persist) | Not Started | projects[], activeProjectId, view state |
-| 1.11 | Create `.env.local` with placeholder values | Not Started | |
-| 1.12 | Create basic landing page (app name + placeholder) | Not Started | Use navy header + teal accent as first visual test |
-| 1.13 | Connect GitHub repo to Vercel | Not Started | |
-| 1.14 | Set environment variables in Vercel dashboard | Not Started | |
-| 1.15 | Push to main → verify Vercel deployment succeeds | Not Started | |
+| 1.2 | Initialize Next.js project with App Router | Done | Next.js 16, React 19, TypeScript |
+| 1.3 | Install & configure Tailwind CSS | Done | Tailwind v4 (CSS-based @theme inline) |
+| 1.4 | Install & configure shadcn/ui | Done | new-york style, Tailwind v4 compatible |
+| 1.5 | Install Zustand + persist middleware | Done | Zustand 5 |
+| 1.6 | Install Framer Motion | Done | Framer Motion 12 |
+| 1.7 | Configure `tailwind.config.ts` with design tokens | Done | Tailwind v4 uses globals.css @theme block instead |
+| 1.8 | Configure `globals.css` with CSS variables + font imports | Done | Plus Jakarta Sans + Inter via next/font |
+| 1.9 | Create `lib/types.ts` (all TypeScript interfaces including Project) | Done | Project entity wraps all module data |
+| 1.10 | Create `lib/store.ts` (multi-project store with persist) | Done | projects[], activeProjectId, view state |
+| 1.11 | Create `.env.local` with placeholder values | Done | |
+| 1.12 | Create basic landing page (app name + placeholder) | Done | Navy header, stage pipeline preview, metric cards |
+| 1.13 | Connect GitHub repo to Vercel | Done | |
+| 1.14 | Set environment variables in Vercel dashboard | Done | |
+| 1.15 | Push to main → verify Vercel deployment succeeds | Done | Live at glad-csr-impact-platform-mvp.vercel.app |
 | | **CHECKPOINT:** Live URL shows styled landing page with correct fonts + colors | | |
 
 ---
@@ -88,19 +88,19 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 2.1 | Install `@anthropic-ai/sdk` and `pdf-parse` | Not Started | |
-| 2.2 | Create `lib/ai/provider.ts` (provider selection + failover) | Not Started | |
-| 2.3 | Create `lib/ai/claude.ts` (Claude API integration) | Not Started | |
-| 2.4 | Create `lib/ai/ollama.ts` (Ollama integration) | Not Started | |
-| 2.5 | Create `lib/ai/prompts.ts` (extraction prompt templates) | Not Started | |
-| 2.6 | Create `lib/ai/pdf-parser.ts` (PDF text extraction) | Not Started | |
-| 2.7 | Create API route: `POST /api/extract/mou` | Not Started | |
-| 2.8 | Create API route: `POST /api/extract/report` | Not Started | |
-| 2.9 | Create API route: `POST /api/extract/evidence` | Not Started | |
-| 2.10 | Create API route: `GET /api/health` | Not Started | |
-| 2.11 | Test locally with sample PDF (Claude) | Not Started | |
-| 2.12 | Test locally with sample PDF (Ollama) | Not Started | |
-| 2.13 | Push → verify Vercel build succeeds | Not Started | |
+| 2.1 | Install `@anthropic-ai/sdk` and `pdf-parse` | Done | Also installed papaparse + type defs |
+| 2.2 | Create `lib/ai/provider.ts` (provider selection + failover) | Done | Auto-detect, 30s cache, primary→fallback chain |
+| 2.3 | Create `lib/ai/claude.ts` (Claude API integration) | Done | Sonnet 4.5, native PDF, lazy client init |
+| 2.4 | Create `lib/ai/ollama.ts` (Ollama integration) | Done | Mistral, 2s health timeout |
+| 2.5 | Create `lib/ai/prompts.ts` (extraction prompt templates) | Done | MoU, Report, Evidence prompts |
+| 2.6 | Create `lib/ai/pdf-parser.ts` (PDF text extraction) | Done | pdf-parse v3 class API (PDFParse) |
+| 2.7 | Create API route: `POST /api/extract/mou` | Done | |
+| 2.8 | Create API route: `POST /api/extract/report` | Done | |
+| 2.9 | Create API route: `POST /api/extract/evidence` | Done | |
+| 2.10 | Create API route: `GET /api/health` | Done | Dynamic import for resilience |
+| 2.11 | Test locally with sample PDF (Claude) | Deferred | Will test during Module 1 (Step 4) |
+| 2.12 | Test locally with sample PDF (Ollama) | Deferred | Will test during Module 1 (Step 4) |
+| 2.13 | Push → verify Vercel build succeeds | Done | Live, /api/health returns JSON |
 | | **CHECKPOINT:** `/api/health` returns status on live URL | | |
 
 ---
@@ -306,7 +306,9 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 
 | # | Date | Issue | Resolution | Status |
 |---|------|-------|------------|--------|
-| — | — | — | — | — |
+| 1 | Feb 11 | pdf-parse v3 API changed from function to class-based | Updated to `new PDFParse({ data })` + `.getText()` | Resolved |
+| 2 | Feb 11 | Vercel 500 — pdf-parse/pdfjs-dist fails at module-level import in serverless | Lazy dynamic `import()` in provider.ts; lazy Anthropic client in claude.ts | Resolved |
+| 3 | Feb 11 | Vercel Deployment Protection blocking public access (401) | Disabled Vercel Authentication for production | Resolved |
 
 ---
 
@@ -328,6 +330,8 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 | 12 | Feb 11 | **Mistral 7B** as Ollama fallback model | Best JSON compliance, lighter RAM (~6GB vs 8GB), faster responses, reliable for exhibition demos |
 | 13 | Feb 11 | **Lightweight SVG** for sparkline charts | Zero bundle cost (~30 lines vs 45KB Recharts), Framer Motion compatible, full design system control. Recharts can be evaluated post-MVP if complex visualizations are needed |
 | 14 | Feb 11 | **Multi-project support** in MVP | Users need to manage multiple CSR projects from a single dashboard. Each project has independent 5-stage pipeline. Data scoped by project ID in Zustand store, persisted to LocalStorage. Moved from "Out of Scope" to core MVP feature. |
+| 15 | Feb 11 | **Next.js 16 / React 19 / Tailwind v4 / Zustand 5** | Latest versions installed (newer than architecture doc specs of 14/18/v3/4). Tailwind v4 uses CSS-based `@theme inline` blocks instead of tailwind.config.ts. All working. |
+| 16 | Feb 11 | **Dynamic imports for Vercel serverless** | Heavy deps (pdf-parse, Anthropic SDK client) must be lazy-loaded to avoid module-level crashes in serverless functions. Pattern: `await import()` inside handler, not top-level import. |
 
 ---
 
