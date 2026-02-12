@@ -2,7 +2,7 @@
 ## CSR Impact Assessment Platform — MVP
 
 **Last Updated:** February 11, 2026
-**Status:** Step 2 — Complete
+**Status:** Step 4 — In Progress
 
 ---
 
@@ -47,8 +47,8 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 |------|------|--------|---------|-----------|
 | 1 | Project Setup + Deployment Pipeline + Design Foundation | Done | Feb 11 | Feb 11 |
 | 2 | AI Extraction Infrastructure | Done | Feb 11 | Feb 11 |
-| 3 | Project Dashboard + App Shell + Base Components (Module 0) | Not Started | — | — |
-| 4 | Module 1 — MoU Upload | Not Started | — | — |
+| 3 | Project Dashboard + App Shell + Base Components (Module 0) | Done | Feb 11 | Feb 11 |
+| 4 | Module 1 — MoU Upload | In Progress | Feb 11 | — |
 | 5 | Module 2 — Progress Reports | Not Started | — | — |
 | 6 | Module 3 — Field Evidence | Not Started | — | — |
 | 7 | Module 4 — SROI Calculation | Not Started | — | — |
@@ -114,33 +114,33 @@ This is where the multi-project dashboard and premium visual identity get built 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
 | | **Project Dashboard** | | |
-| 3.1 | Create `ProjectDashboard.tsx` — landing page with project list | Not Started | UI/UX §5.0: Grid layout, "Your Projects" heading, "+ New Project" button |
-| 3.2 | Create `ProjectCard.tsx` — project card with stage progress + status | Not Started | UI/UX §5.0: Left accent bar by stage, mini stage indicator, hover elevation |
-| 3.3 | Create `CreateProjectDialog.tsx` — new project creation dialog | Not Started | UI/UX §5.0: Modal with optional name input |
-| 3.4 | Implement dashboard empty state (no projects yet) | Not Started | UI/UX §5.0: Icon, heading, "Create New Project" CTA |
-| 3.5 | Implement delete project with confirmation dialog | Not Started | |
-| 3.6 | Implement two-level navigation (dashboard ↔ project) | Not Started | Tech Arch §9: view state, openProject(), goToDashboard() |
-| 3.7 | Project card stagger animation | Not Started | UI/UX §6.2: 500ms, staggered 80ms |
+| 3.1 | Create `ProjectDashboard.tsx` — landing page with project list | Done | Grid layout, project count, "New Project" button |
+| 3.2 | Create `ProjectCard.tsx` — project card with stage progress + status | Done | Left accent bar, mini stage dots, SROI badge, hover elevation |
+| 3.3 | Create `CreateProjectDialog.tsx` — new project creation dialog | Done | Modal with name input, auto-navigates on create |
+| 3.4 | Implement dashboard empty state (no projects yet) | Done | FolderOpen icon, heading, CTA with fadeIn animation |
+| 3.5 | Implement delete project with confirmation dialog | Done | Trash icon on hover, confirmation dialog |
+| 3.6 | Implement two-level navigation (dashboard ↔ project) | Done | page.tsx uses store view state |
+| 3.7 | Project card stagger animation | Done | Framer Motion, 400ms staggered 80ms |
 | | **App Shell (per project)** | | |
-| 3.8 | Create `AppShell.tsx` — navy header with project name + "← Back" link | Not Started | UI/UX §5.1: Navy #0F172A, 64px height, project name in header |
-| 3.9 | Create `StageStepper.tsx` — 5-step horizontal stepper | Not Started | UI/UX §5.2: Colored circles, connector lines, pulse animation on current |
-| 3.10 | Create `StageContainer.tsx` — stage content wrapper with title + nav buttons | Not Started | UI/UX §4.1: Layout structure, back/continue buttons |
-| 3.11 | Create `AIStatusIndicator.tsx` — provider status badge in header | Not Started | Tech Arch §4.7: Green/Blue/Red dot |
+| 3.8 | Create `AppShell.tsx` — navy header with project name + "← Back" link | Done | ArrowLeft + "Back to Projects", project name centered |
+| 3.9 | Create `StageStepper.tsx` — 5-step horizontal stepper | Done | Colored circles, connector lines, check on complete, clickable |
+| 3.10 | Create `StageContainer.tsx` — stage content wrapper with title + nav buttons | Done | Animated slide transitions, Back/Continue buttons |
+| 3.11 | Create `AIStatusIndicator.tsx` — provider status badge in header | Done | Polls /api/health every 30s, Cloud/Local/Offline states |
 | | **Base Components** | | |
-| 3.12 | Style base shadcn/ui Button variants (primary, secondary, danger) | Not Started | UI/UX §5.3: Teal primary, hover/active states, 200ms transition |
-| 3.13 | Style base shadcn/ui Card variants (standard, elevated, dark) | Not Started | UI/UX §4.3: Three card tiers with correct shadows/borders |
-| 3.14 | Style base Badge component (on-track, at-risk, behind, etc.) | Not Started | UI/UX §5.8: All status badge variants |
-| 3.15 | Create reusable UploadZone component (shared by Stages 1, 2, 3) | Not Started | UI/UX §5.4: Dashed border, hover/drag states, processing state |
-| 3.16 | Set up Framer Motion transition wrappers (dashboard ↔ project + stage transitions) | Not Started | UI/UX §6.2-6.3: Dashboard transition + slide left/right between stages |
-| 3.17 | Create skeleton loading component | Not Started | UI/UX §7.1: Gray shimmer blocks, 1.5s pulse cycle |
+| 3.12 | Style base shadcn/ui Button variants (primary, secondary, danger) | Done | Installed via shadcn CLI with project theme |
+| 3.13 | Style base shadcn/ui Card variants (standard, elevated, dark) | Done | Installed via shadcn CLI |
+| 3.14 | Style base Badge component (on-track, at-risk, behind, etc.) | Done | Installed via shadcn CLI |
+| 3.15 | Create reusable UploadZone component (shared by Stages 1, 2, 3) | Deferred | Will build in Step 4 with Stage 1 |
+| 3.16 | Set up Framer Motion transition wrappers (dashboard ↔ project + stage transitions) | Done | StageContainer uses AnimatePresence with directional slides |
+| 3.17 | Create skeleton loading component | Done | Installed via shadcn CLI |
 | | **Store Logic** | | |
-| 3.18 | Implement project management in store (createProject, deleteProject, openProject, goToDashboard) | Not Started | |
-| 3.19 | Implement per-project navigation (currentStage, goToStage, nextStage, prevStage) | Not Started | |
-| 3.20 | Implement stage locking logic (per project) | Not Started | |
-| 3.21 | Add reset project functionality | Not Started | |
+| 3.18 | Implement project management in store (createProject, deleteProject, openProject, goToDashboard) | Done | Already in store from Step 1 |
+| 3.19 | Implement per-project navigation (currentStage, goToStage, nextStage, prevStage) | Done | Already in store from Step 1 |
+| 3.20 | Implement stage locking logic (per project) | Done | goToStage enforces maxAllowed = currentStage + 1 |
+| 3.21 | Add reset project functionality | Done | Already in store from Step 1 |
 | | **Testing** | | |
-| 3.22 | Responsive layout testing (desktop + tablet) | Not Started | UI/UX §9: 1200px max-width, tablet stacking |
-| 3.23 | Push → verify deployment | Not Started | |
+| 3.22 | Responsive layout testing (desktop + tablet) | Done | 3-col/2-col/1-col grid, stepper hides labels on mobile |
+| 3.23 | Push → verify deployment | Done | Pushed to main, Vercel auto-deploys |
 | | **CHECKPOINT:** Live URL shows project dashboard, can create project, enter 5-stage shell with animated stepper, correct fonts, navy header | | |
 
 ---
@@ -151,18 +151,18 @@ This is where the multi-project dashboard and premium visual identity get built 
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 4.1 | Create `MoUUpload.tsx` using shared UploadZone | Not Started | Accepts .pdf only |
-| 4.2 | File validation (type check, 10MB size limit) | Not Started | |
-| 4.3 | Wire upload to `POST /api/extract/mou` | Not Started | |
-| 4.4 | AI extraction loading state (spinner + provider badge + animated dots) | Not Started | UI/UX §7.1: "Analyzing document with AI..." |
-| 4.5 | Extraction reveal animation (upload shrinks, cards animate in staggered) | Not Started | UI/UX §6.4: Upload shrinks → success pulse → cards stagger in |
-| 4.6 | Create `ProjectDetailsCard.tsx` (editable fields with hover pencil icon) | Not Started | UI/UX §7.4: Edit mode toggle |
-| 4.7 | Create `KPICard.tsx` (left accent bar by category, inline edit, delete) | Not Started | UI/UX §5.5: Teal=output, Green=outcome, Gold=impact |
-| 4.8 | Create `KPIList.tsx` (animated list + add KPI button) | Not Started | Framer Motion AnimatePresence for add/delete |
-| 4.9 | Manual entry fallback (if AI extraction fails) | Not Started | Empty form with same fields |
-| 4.10 | Confirm button → locks data, enables Stage 2 | Not Started | |
-| 4.11 | Re-upload option (clears previous data) | Not Started | |
-| 4.12 | Wire to Zustand store (MoU slice) | Not Started | |
+| 4.1 | Create `MoUUpload.tsx` using shared UploadZone | Done | Drag-drop + click, state machine (empty/uploading/extracted/confirmed/error) |
+| 4.2 | File validation (type check, 10MB size limit) | Done | PDF-only, 10MB max, inline error messages |
+| 4.3 | Wire upload to `POST /api/extract/mou` | Done | FormData POST, parses projectDetails + kpis |
+| 4.4 | AI extraction loading state (spinner + provider badge + animated dots) | Done | Loader2 spin, "Analyzing document with AI..." |
+| 4.5 | Extraction reveal animation (upload shrinks, cards animate in staggered) | Done | AnimatePresence exit + staggered entry (0.1s, 0.2s, 0.35s, 0.5s) |
+| 4.6 | Create `ProjectDetailsCard.tsx` (editable fields with hover pencil icon) | Done | 6 fields, edit mode toggle, grid layout with icons |
+| 4.7 | Create `KPICard.tsx` (left accent bar by category, inline edit, delete) | Done | Teal=output, Green=outcome, Gold=impact, full edit form |
+| 4.8 | Create `KPIList.tsx` (animated list + add KPI button) | Done | 2-col grid, AnimatePresence, empty state, count badge |
+| 4.9 | Manual entry fallback (if AI extraction fails) | Done | "Enter Manually" button in error state, creates blank form |
+| 4.10 | Confirm button → locks data, enables Stage 2 | Done | "Confirm & Lock Data", disabled if 0 KPIs, green badge when confirmed |
+| 4.11 | Re-upload option (clears previous data) | Done | "Re-upload" button resets MoU data and stage status |
+| 4.12 | Wire to Zustand store (MoU slice) | Done | updateActiveProject for all state changes |
 | 4.13 | Push → verify deployment | Not Started | |
 | | **CHECKPOINT:** Can upload MoU, see animated extraction reveal, edit KPIs on live URL | | |
 

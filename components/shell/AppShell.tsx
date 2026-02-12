@@ -6,6 +6,7 @@ import { useStore } from "@/lib/store";
 import { AIStatusIndicator } from "./AIStatusIndicator";
 import { StageStepper } from "./StageStepper";
 import { StageContainer } from "./StageContainer";
+import { MoUUpload } from "@/components/stage1-mou/MoUUpload";
 
 export function AppShell() {
   const project = useStore((s) => s.getActiveProject());
@@ -71,7 +72,11 @@ export function AppShell() {
         canContinue={canContinue[project.currentStage]}
         direction={directionRef.current}
       >
-        <StagePlaceholder stage={project.currentStage} />
+        {project.currentStage === 1 ? (
+          <MoUUpload />
+        ) : (
+          <StagePlaceholder stage={project.currentStage} />
+        )}
       </StageContainer>
     </div>
   );
