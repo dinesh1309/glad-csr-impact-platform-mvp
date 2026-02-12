@@ -71,7 +71,7 @@ export function ProjectCard({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.08, ease: "easeOut" }}
+        transition={{ duration: 0.4, delay: index * 0.1, ease: "easeOut" }}
         onClick={() => onOpen(project.id)}
         className="group relative flex cursor-pointer overflow-hidden rounded-xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md"
       >

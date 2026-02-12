@@ -74,7 +74,7 @@ export function StageContainer({
           initial={{ opacity: 0, x: direction * 60 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: direction * -60 }}
-          transition={{ duration: 0.35, ease: "easeInOut" }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
           className="min-h-[400px]"
         >
           {children}

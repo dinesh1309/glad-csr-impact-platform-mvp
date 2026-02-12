@@ -76,10 +76,10 @@ export function StageStepper({ project, onGoToStage }: StageStepperProps) {
                   )}
                 </div>
                 <span
-                  className={`text-xs font-medium hidden md:block ${
+                  className={`text-[13px] hidden md:block ${
                     completed || isCurrent
-                      ? "text-dark"
-                      : "text-slate-400"
+                      ? "font-semibold text-dark"
+                      : "font-normal text-slate-400"
                   }`}
                 >
                   {stage.label}
