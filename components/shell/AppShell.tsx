@@ -9,6 +9,7 @@ import { StageContainer } from "./StageContainer";
 import { MoUUpload } from "@/components/stage1-mou/MoUUpload";
 import { ReportUpload } from "@/components/stage2-progress/ReportUpload";
 import { EvidenceUpload } from "@/components/stage3-evidence/EvidenceUpload";
+import { SROICalculator } from "@/components/stage4-sroi/SROICalculator";
 
 export function AppShell() {
   const project = useStore((s) => s.getActiveProject());
@@ -80,6 +81,8 @@ export function AppShell() {
           <ReportUpload />
         ) : project.currentStage === 3 ? (
           <EvidenceUpload />
+        ) : project.currentStage === 4 ? (
+          <SROICalculator />
         ) : (
           <StagePlaceholder stage={project.currentStage} />
         )}

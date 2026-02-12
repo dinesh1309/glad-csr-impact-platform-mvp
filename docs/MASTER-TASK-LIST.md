@@ -51,7 +51,7 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 4 | Module 1 — MoU Upload | Done | Feb 11 | Feb 11 |
 | 5 | Module 2 — Progress Reports | Done | Feb 12 | Feb 12 |
 | 6 | Module 3 — Field Evidence | Done | Feb 12 | Feb 12 |
-| 7 | Module 4 — SROI Calculation | Not Started | — | — |
+| 7 | Module 4 — SROI Calculation | Done | Feb 12 | Feb 12 |
 | 8 | Module 5 — Report Generation | Not Started | — | — |
 | 9 | Polish & Exhibition Prep (UI/UX Verification) | Not Started | — | — |
 
@@ -217,17 +217,17 @@ This is where the multi-project dashboard and premium visual identity get built 
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 7.1 | Create `lib/calculations.ts` (SROI pure functions) | Not Started | |
-| 7.2 | Create `OutcomesTable.tsx` (from Module 2 data, animated rows) | Not Started | |
-| 7.3 | Monetization table (outcome → INR value mapping) | Not Started | |
-| 7.4 | Investment input field | Not Started | |
-| 7.5 | Create `AdjustmentSliders.tsx` (3 sliders with tooltips) | Not Started | Deadweight, Attribution, Drop-off |
-| 7.6 | Slider tooltip explanations | Not Started | |
-| 7.7 | Create `CalculationBreakdown.tsx` (step-by-step animated flow) | Not Started | UI/UX §5.7: Horizontal flow with animated arrows |
-| 7.8 | Create `SROIDisplay.tsx` — dark gradient card, gold number, glow | Not Started | UI/UX §5.7: 48px bold, gold glow, counter animation 1.5s |
-| 7.9 | Live calculation (updates in real-time as inputs change) | Not Started | |
-| 7.10 | Plain English summary with gold highlight on the value | Not Started | "Every ₹1 invested created ₹X.XX of social value" |
-| 7.11 | Wire to Zustand store (SROI slice) | Not Started | |
+| 7.1 | Create `lib/calculations.ts` (SROI pure functions) | Done | calculateSROI + buildOutcomesFromProgress |
+| 7.2 | Create `OutcomesTable.tsx` (from Module 2 data, animated rows) | Done | Auto-populates from progressData, animated rows |
+| 7.3 | Monetization table (outcome → INR value mapping) | Done | Inline edit monetized value + method per outcome |
+| 7.4 | Investment input field | Done | ₹ input with formatted display |
+| 7.5 | Create `AdjustmentSliders.tsx` (3 sliders with tooltips) | Done | 0-50% range, navy tooltip on hover |
+| 7.6 | Slider tooltip explanations | Done | Deadweight, Attribution, Drop-off explanations |
+| 7.7 | Create `CalculationBreakdown.tsx` (step-by-step animated flow) | Done | Horizontal flow: Gross → Adjustments ÷ Investment = Ratio |
+| 7.8 | Create `SROIDisplay.tsx` — dark gradient card, gold number, glow | Done | 48px gold #F59E0B, radial glow, counter animation 1.5s |
+| 7.9 | Live calculation (updates in real-time as inputs change) | Done | useMemo recalculates on any input change |
+| 7.10 | Plain English summary with gold highlight on the value | Done | "Every ₹1 invested created ₹X.XX of social value" |
+| 7.11 | Wire to Zustand store (SROI slice) | Done | Auto-saves calculatedRatio, auto-completes stage4 |
 | 7.12 | Push → verify deployment | Not Started | |
 | | **CHECKPOINT:** Full Stage 1→2→3→4 with animated SROI counter on live URL | | |
 
