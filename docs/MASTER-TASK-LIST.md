@@ -2,7 +2,7 @@
 ## CSR Impact Assessment Platform — MVP
 
 **Last Updated:** February 11, 2026
-**Status:** Step 4 — Complete
+**Status:** Step 8 — Complete (all 5 modules built)
 
 ---
 
@@ -52,7 +52,7 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 5 | Module 2 — Progress Reports | Done | Feb 12 | Feb 12 |
 | 6 | Module 3 — Field Evidence | Done | Feb 12 | Feb 12 |
 | 7 | Module 4 — SROI Calculation | Done | Feb 12 | Feb 12 |
-| 8 | Module 5 — Report Generation | Not Started | — | — |
+| 8 | Module 5 — Report Generation | Done | 10/11 | Push pending |
 | 9 | Polish & Exhibition Prep (UI/UX Verification) | Not Started | — | — |
 
 ---
@@ -239,17 +239,17 @@ This is where the multi-project dashboard and premium visual identity get built 
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 8.1 | Install `@react-pdf/renderer` | Not Started | |
-| 8.2 | Create `ReportPreview.tsx` (HTML preview, A4 paper shadow styling) | Not Started | UI/UX §8: Heavy shadow, navy cover, teal accents |
-| 8.3 | Preview — Cover page (navy background, white text, project name) | Not Started | UI/UX §8: Dark navy, geometric pattern |
-| 8.4 | Preview — Executive Summary section | Not Started | |
-| 8.5 | Preview — Project Overview + KPI Achievement table | Not Started | UI/UX §8: Alternating row backgrounds, navy header row |
-| 8.6 | Preview — Evidence Summary + SROI section (dark card style) | Not Started | |
-| 8.7 | Create `PDFDocument.tsx` (@react-pdf, mirrors preview layout) | Not Started | |
-| 8.8 | PDF generation + download button with loading state | Not Started | |
-| 8.9 | Regenerate option (if user went back and changed data) | Not Started | |
-| 8.10 | Wire to Zustand store (Report slice, reads all modules) | Not Started | |
-| 8.11 | Push → verify deployment | Not Started | |
+| 8.1 | Install `@react-pdf/renderer` | Done | v4.3.2 (React 19 compatible) |
+| 8.2 | Create `ReportPreview.tsx` (HTML preview, A4 paper shadow styling) | Done | UI/UX §8: Heavy shadow, navy cover, teal accents |
+| 8.3 | Preview — Cover page (navy background, white text, project name) | Done | UI/UX §8: Dark navy, geometric pattern |
+| 8.4 | Preview — Executive Summary section | Done | Auto-generated from data |
+| 8.5 | Preview — Project Overview + KPI Achievement table | Done | UI/UX §8: Alternating row backgrounds, navy header row |
+| 8.6 | Preview — Evidence Summary + SROI section (dark card style) | Done | Gold SROI highlight |
+| 8.7 | Create `PDFDocument.tsx` (@react-pdf, mirrors preview layout) | Done | 3-page PDF with all sections |
+| 8.8 | PDF generation + download button with loading state | Done | Client-side blob + download |
+| 8.9 | Regenerate option (if user went back and changed data) | Done | Regenerate button |
+| 8.10 | Wire to Zustand store (Report slice, reads all modules) | Done | ReportGeneration.tsx orchestrator |
+| 8.11 | Push → verify deployment | Pending | |
 | | **CHECKPOINT:** Complete end-to-end flow with PDF download on live URL | | |
 
 ---

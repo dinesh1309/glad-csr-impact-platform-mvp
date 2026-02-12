@@ -10,6 +10,7 @@ import { MoUUpload } from "@/components/stage1-mou/MoUUpload";
 import { ReportUpload } from "@/components/stage2-progress/ReportUpload";
 import { EvidenceUpload } from "@/components/stage3-evidence/EvidenceUpload";
 import { SROICalculator } from "@/components/stage4-sroi/SROICalculator";
+import { ReportGeneration } from "@/components/stage5-report/ReportGeneration";
 
 export function AppShell() {
   const project = useStore((s) => s.getActiveProject());
@@ -83,42 +84,10 @@ export function AppShell() {
           <EvidenceUpload />
         ) : project.currentStage === 4 ? (
           <SROICalculator />
-        ) : (
-          <StagePlaceholder stage={project.currentStage} />
-        )}
+        ) : project.currentStage === 5 ? (
+          <ReportGeneration />
+        ) : null}
       </StageContainer>
-    </div>
-  );
-}
-
-function StagePlaceholder({ stage }: { stage: number }) {
-  const labels = {
-    1: "MoU Upload",
-    2: "Progress Reports",
-    3: "Field Evidence",
-    4: "SROI Calculation",
-    5: "Report Generation",
-  };
-  const colors = {
-    1: "border-stage-1 text-stage-1",
-    2: "border-stage-2 text-stage-2",
-    3: "border-stage-3 text-stage-3",
-    4: "border-stage-4 text-stage-4",
-    5: "border-stage-5 text-stage-5",
-  };
-
-  return (
-    <div
-      className={`flex min-h-[300px] items-center justify-center rounded-2xl border-2 border-dashed ${colors[stage as keyof typeof colors]}`}
-    >
-      <div className="text-center">
-        <p className="text-lg font-semibold">
-          {labels[stage as keyof typeof labels]}
-        </p>
-        <p className="mt-1 text-sm text-muted">
-          This module will be built in Step {stage + 3}
-        </p>
-      </div>
     </div>
   );
 }
