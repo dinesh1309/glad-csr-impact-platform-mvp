@@ -63,13 +63,14 @@ export async function getActiveProvider(): Promise<ProviderName> {
  */
 export async function extractFromPDF(
   pdfBuffer: Buffer,
-  prompt: string
+  prompt: string,
+  providerOverride?: ProviderName
 ): Promise<{ text: string; provider: ProviderName }> {
   const pdfBase64 = pdfBuffer.toString("base64");
   let primary: ProviderName;
 
   try {
-    primary = await getActiveProvider();
+    primary = providerOverride ?? (await getActiveProvider());
   } catch {
     throw new Error("No AI provider available");
   }
@@ -109,12 +110,13 @@ export async function extractFromPDF(
  */
 export async function extractFromText(
   text: string,
-  prompt: string
+  prompt: string,
+  providerOverride?: ProviderName
 ): Promise<{ text: string; provider: ProviderName }> {
   let primary: ProviderName;
 
   try {
-    primary = await getActiveProvider();
+    primary = providerOverride ?? (await getActiveProvider());
   } catch {
     throw new Error("No AI provider available");
   }

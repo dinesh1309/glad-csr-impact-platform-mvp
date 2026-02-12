@@ -2,7 +2,7 @@
 ## CSR Impact Assessment Platform — MVP
 
 **Last Updated:** February 11, 2026
-**Status:** Step 4 — In Progress
+**Status:** Step 4 — Complete
 
 ---
 
@@ -48,8 +48,8 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 1 | Project Setup + Deployment Pipeline + Design Foundation | Done | Feb 11 | Feb 11 |
 | 2 | AI Extraction Infrastructure | Done | Feb 11 | Feb 11 |
 | 3 | Project Dashboard + App Shell + Base Components (Module 0) | Done | Feb 11 | Feb 11 |
-| 4 | Module 1 — MoU Upload | In Progress | Feb 11 | — |
-| 5 | Module 2 — Progress Reports | Not Started | — | — |
+| 4 | Module 1 — MoU Upload | Done | Feb 11 | Feb 11 |
+| 5 | Module 2 — Progress Reports | In Progress | Feb 12 | — |
 | 6 | Module 3 — Field Evidence | Not Started | — | — |
 | 7 | Module 4 — SROI Calculation | Not Started | — | — |
 | 8 | Module 5 — Report Generation | Not Started | — | — |
@@ -163,7 +163,7 @@ This is where the multi-project dashboard and premium visual identity get built 
 | 4.10 | Confirm button → locks data, enables Stage 2 | Done | "Confirm & Lock Data", disabled if 0 KPIs, green badge when confirmed |
 | 4.11 | Re-upload option (clears previous data) | Done | "Re-upload" button resets MoU data and stage status |
 | 4.12 | Wire to Zustand store (MoU slice) | Done | updateActiveProject for all state changes |
-| 4.13 | Push → verify deployment | Not Started | |
+| 4.13 | Push → verify deployment | Done | Pushed to main, Vercel auto-deploys |
 | | **CHECKPOINT:** Can upload MoU, see animated extraction reveal, edit KPIs on live URL | | |
 
 ---
@@ -174,16 +174,16 @@ This is where the multi-project dashboard and premium visual identity get built 
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 5.1 | Create `ReportUpload.tsx` using shared UploadZone (multi-file) | Not Started | |
-| 5.2 | Wire upload to `POST /api/extract/report` | Not Started | |
-| 5.3 | Create `ReportList.tsx` (status per file, animated list) | Not Started | |
-| 5.4 | Processing queue (sequential, animated progress per file) | Not Started | |
-| 5.5 | Create `ProgressDashboard.tsx` (grid of progress cards) | Not Started | |
-| 5.6 | Create `ProgressCard.tsx` with animated progress bar fill | Not Started | UI/UX §5.6: 800ms easeOutCubic fill, color by status |
-| 5.7 | Status badges (On Track / At Risk / Behind) | Not Started | UI/UX §5.8: Colored pill badges |
-| 5.8 | Gap highlighting (visual emphasis on behind-target KPIs) | Not Started | |
-| 5.9 | Manual override for extracted values | Not Started | |
-| 5.10 | Wire to Zustand store (Reports slice, reads KPIs from Module 1) | Not Started | |
+| 5.1 | Create `ReportUpload.tsx` using shared UploadZone (multi-file) | Done | Multi-file drag-drop, sequential processing queue |
+| 5.2 | Wire upload to `POST /api/extract/report` | Done | FormData with KPIs context, provider header |
+| 5.3 | Create `ReportList.tsx` (status per file, animated list) | Done | Animated list with status icons, delete, KPI count |
+| 5.4 | Processing queue (sequential, animated progress per file) | Done | Sequential await loop, per-file status updates |
+| 5.5 | Create `ProgressDashboard.tsx` (grid of progress cards) | Done | 2-col grid, summary pills, gap warning banner |
+| 5.6 | Create `ProgressCard.tsx` with animated progress bar fill | Done | 800ms easeOutCubic fill, sparkline bars |
+| 5.7 | Status badges (On Track / At Risk / Behind) | Done | Emerald/amber/red pill badges per UI/UX §5.8 |
+| 5.8 | Gap highlighting (visual emphasis on behind-target KPIs) | Done | Behind KPIs sorted first + red warning banner |
+| 5.9 | Manual override for extracted values | Done | Hover pencil icon, inline edit with recalculation |
+| 5.10 | Wire to Zustand store (Reports slice, reads KPIs from Module 1) | Done | computeProgressData aggregates across all reports |
 | 5.11 | Push → verify deployment | Not Started | |
 | | **CHECKPOINT:** Full Stage 1→2 flow with animated progress bars on live URL | | |
 

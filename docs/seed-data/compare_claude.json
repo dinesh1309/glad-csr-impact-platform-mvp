@@ -1,0 +1,136 @@
+{
+  "success": true,
+  "data": {
+    "projectDetails": {
+      "projectName": "Establishment of CSR Projects Facilitation Unit (CPFU) and CSR Support for Industry-Academia Connect",
+      "ngoName": "CSRBOX Group",
+      "location": "Pan-India",
+      "duration": "36 months",
+      "startDate": "2025-09-12",
+      "totalBudget": null
+    },
+    "kpis": [
+      {
+        "id": "kpi-1",
+        "name": "CSR Fellows Deployed at AICTE Headquarters",
+        "targetValue": 2,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-2",
+        "name": "Student Outreach & Engagement",
+        "targetValue": 200000,
+        "unit": "count",
+        "targetDate": null,
+        "category": "outcome"
+      },
+      {
+        "id": "kpi-3",
+        "name": "Centres of Excellence Established",
+        "targetValue": 5,
+        "unit": "count",
+        "targetDate": "2028-09-12",
+        "category": "output"
+      },
+      {
+        "id": "kpi-4",
+        "name": "National-level Hackathons and Innovation Showcases",
+        "targetValue": 3,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-5",
+        "name": "Capacity-Building Workshops and Industry-Led Sessions",
+        "targetValue": 10,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-6",
+        "name": "Industry-Academia Collaborations Facilitated",
+        "targetValue": 8,
+        "unit": "count",
+        "targetDate": null,
+        "category": "outcome"
+      },
+      {
+        "id": "kpi-7",
+        "name": "Quarterly Progress Reports Submitted",
+        "targetValue": 4,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-8",
+        "name": "Annual Impact Reports Submitted",
+        "targetValue": 1,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-9",
+        "name": "Bi-annual Progress Reports Submitted",
+        "targetValue": 2,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-10",
+        "name": "Real-time Project Dashboards Maintained",
+        "targetValue": 1,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-11",
+        "name": "Innovation and Hackathon Compendium Published",
+        "targetValue": 1,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-12",
+        "name": "Knowledge Resource Repository Developed",
+        "targetValue": 1,
+        "unit": "count",
+        "targetDate": "2028-09-12",
+        "category": "output"
+      },
+      {
+        "id": "kpi-13",
+        "name": "Centre of Excellence Setup Reports",
+        "targetValue": 5,
+        "unit": "count",
+        "targetDate": "2028-09-12",
+        "category": "output"
+      },
+      {
+        "id": "kpi-14",
+        "name": "Annual Strategic Recommendations Reports",
+        "targetValue": 1,
+        "unit": "count",
+        "targetDate": null,
+        "category": "impact"
+      },
+      {
+        "id": "kpi-15",
+        "name": "Corporate CSR Partnerships Mobilized",
+        "targetValue": 10,
+        "unit": "count",
+        "targetDate": "2028-09-12",
+        "category": "outcome"
+      }
+    ]
+  },
+  "provider": "claude"
+}

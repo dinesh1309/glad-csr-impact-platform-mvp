@@ -1,0 +1,36 @@
+Participant Name,Designation,Institution,State,Workshop Title,Date,Duration (hours),Certification Issued (Yes/No),Feedback Score (1-5)
+Dr. Rajesh Kumar,Professor,IIT Delhi,Delhi,AI & ML Fundamentals,2025-11-15,8,Yes,5
+Dr. Sunita Sharma,Associate Professor,DTU Delhi,Delhi,AI & ML Fundamentals,2025-11-15,8,Yes,4
+Prof. Anil Verma,Assistant Professor,NSUT Delhi,Delhi,AI & ML Fundamentals,2025-11-15,8,Yes,5
+Dr. Meena Gupta,Professor,IGDTUW Delhi,Delhi,AI & ML Fundamentals,2025-11-15,8,Yes,4
+Dr. Vikram Singh,Associate Professor,JIIT Noida,Uttar Pradesh,AI & ML Fundamentals,2025-11-15,8,Yes,5
+Prof. Kavita Joshi,Assistant Professor,NIT Surat,Gujarat,Sustainability in Tech,2025-11-22,6,Yes,4
+Dr. Ramesh Patel,Professor,SVNIT Surat,Gujarat,Sustainability in Tech,2025-11-22,6,Yes,3
+Dr. Suman Reddy,Associate Professor,JNTU Hyderabad,Telangana,Sustainability in Tech,2025-11-22,6,Yes,4
+Prof. Deepak Menon,Assistant Professor,COEP Pune,Maharashtra,Sustainability in Tech,2025-11-22,6,Yes,5
+Dr. Lakshmi Nair,Professor,CET Trivandrum,Kerala,Sustainability in Tech,2025-11-22,6,Yes,4
+Dr. Ashok Rao,Associate Professor,NIT Calicut,Kerala,IoT for Social Good,2025-11-28,8,Yes,4
+Prof. Geeta Kumari,Assistant Professor,NIT Patna,Bihar,IoT for Social Good,2025-11-28,8,Yes,5
+Dr. Manoj Tiwari,Professor,MNNIT Allahabad,Uttar Pradesh,IoT for Social Good,2025-11-28,8,Yes,4
+Dr. Padma Iyer,Associate Professor,PSG Tech Coimbatore,Tamil Nadu,IoT for Social Good,2025-11-28,8,Yes,4
+Prof. Suresh Babu,Assistant Professor,Anna University,Tamil Nadu,IoT for Social Good,2025-11-28,8,Yes,5
+Dr. Nandini Rao,Professor,RVCE Bangalore,Karnataka,Green Tech Innovation,2026-01-12,6,Yes,5
+Dr. Kiran Jain,Associate Professor,BMSCE Bangalore,Karnataka,Green Tech Innovation,2026-01-12,6,Yes,4
+Prof. Ravi Shankar,Assistant Professor,NIE Mysuru,Karnataka,Green Tech Innovation,2026-01-12,6,Yes,4
+Dr. Anita Desai,Professor,VJTI Mumbai,Maharashtra,Green Tech Innovation,2026-01-12,6,Yes,5
+Dr. Pradeep Kulkarni,Associate Professor,COEP Pune,Maharashtra,Green Tech Innovation,2026-01-12,6,Yes,4
+Prof. Sangeeta Mishra,Assistant Professor,IIT Kanpur,Uttar Pradesh,Green Tech Innovation,2026-01-12,6,Yes,5
+Dr. Vinod Sharma,Professor,PEC Chandigarh,Punjab,Innovation Mgmt & IPR,2026-01-20,8,Yes,4
+Prof. Harpreet Singh,Associate Professor,Thapar University,Punjab,Innovation Mgmt & IPR,2026-01-20,8,Yes,5
+Dr. Rekha Gupta,Assistant Professor,NIT Jalandhar,Punjab,Innovation Mgmt & IPR,2026-01-20,8,Yes,4
+Dr. Baldev Raj,Professor,GNDEC Ludhiana,Punjab,Innovation Mgmt & IPR,2026-01-20,8,Yes,3
+Prof. Kamala Devi,Associate Professor,IIT Mandi,Himachal Pradesh,Innovation Mgmt & IPR,2026-01-20,8,Yes,4
+Dr. Sanjay Mittal,Assistant Professor,Chitkara University,Punjab,Innovation Mgmt & IPR,2026-01-20,8,Yes,5
+Dr. Rashmi Kapoor,Professor,IIT BHU,Uttar Pradesh,Data Analytics for Impact,2026-02-08,6,Yes,5
+Prof. Arun Jha,Associate Professor,NIT Jamshedpur,Jharkhand,Data Analytics for Impact,2026-02-08,6,Yes,4
+Dr. Pooja Banerjee,Assistant Professor,Jadavpur University,West Bengal,Data Analytics for Impact,2026-02-08,6,Yes,4
+Dr. Mohan Das,Professor,NIT Durgapur,West Bengal,Data Analytics for Impact,2026-02-08,6,Yes,5
+Prof. Usha Rani,Associate Professor,BIT Mesra,Jharkhand,Data Analytics for Impact,2026-02-08,6,Yes,4
+Dr. Naveen Kumar,Assistant Professor,IIT Kharagpur,West Bengal,Data Analytics for Impact,2026-02-08,6,Yes,5
+Dr. Shobha Rani,Professor,IIT Guwahati,Assam,Data Analytics for Impact,2026-02-08,6,Yes,4
+Prof. Alok Srivastava,Associate Professor,NIT Silchar,Assam,Data Analytics for Impact,2026-02-08,6,Yes,4

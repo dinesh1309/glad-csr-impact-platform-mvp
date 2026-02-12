@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractFromText, parseJSONResponse } from "@/lib/ai/provider";
+import { extractFromText, parseJSONResponse, type ProviderName } from "@/lib/ai/provider";
 import { buildEvidenceAnalysisPrompt } from "@/lib/ai/prompts";
 import type { ValidationResult } from "@/lib/types";
 
@@ -30,9 +30,11 @@ export async function POST(request: NextRequest) {
       linkedKpiData
     );
 
+    const override = (body as { providerOverride?: ProviderName }).providerOverride;
     const result = await extractFromText(
       "See evidence metadata and KPI data in the prompt above.",
-      prompt
+      prompt,
+      override || undefined
     );
     const data = parseJSONResponse<EvidenceAnalysisResponse>(result.text);
 

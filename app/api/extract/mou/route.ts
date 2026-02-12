@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractFromPDF, parseJSONResponse } from "@/lib/ai/provider";
+import { extractFromPDF, parseJSONResponse, type ProviderName } from "@/lib/ai/provider";
 import { MOU_EXTRACTION_PROMPT } from "@/lib/ai/prompts";
 import type { ProjectDetails, KPI } from "@/lib/types";
 
@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const pdfBuffer = Buffer.from(arrayBuffer);
 
-    const result = await extractFromPDF(pdfBuffer, MOU_EXTRACTION_PROMPT);
+    const override = request.headers.get("x-ai-provider") as ProviderName | null;
+    const result = await extractFromPDF(pdfBuffer, MOU_EXTRACTION_PROMPT, override || undefined);
     const data = parseJSONResponse<MoUExtractionResponse>(result.text);
 
     return NextResponse.json({

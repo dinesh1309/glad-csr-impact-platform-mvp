@@ -1,31 +1,49 @@
 // Extraction prompt templates — shared by Claude and Ollama providers
 // See: Technical Architecture §4.5
 
-export const MOU_EXTRACTION_PROMPT = `You are analyzing a Memorandum of Understanding (MoU) for a CSR (Corporate Social Responsibility) project.
+export const MOU_EXTRACTION_PROMPT = `You are an expert CSR impact analyst extracting structured data from a Memorandum of Understanding (MoU) between organizations.
 
-Extract the following structured data from this document:
+IMPORTANT: CSR/government MoUs often do NOT have a dedicated "KPI" section. Measurable commitments are typically scattered across purpose/scope sections, role descriptions, deliverables lists, and reporting clauses. You MUST scan the ENTIRE document thoroughly.
+
+Extract the following:
 
 1. **Project Details:**
-   - projectName: The name of the CSR project
-   - ngoName: The implementing NGO or partner organization
-   - location: Geographic location(s) of the project
-   - duration: Duration of the project (e.g., "12 months")
-   - startDate: Project start date in YYYY-MM-DD format (estimate if only month/year given)
-   - totalBudget: Total budget as a number in INR (null if not mentioned)
+   - projectName: The project or initiative name (look at the title, subject line, or "purpose" section)
+   - ngoName: The implementing/partner organization (not the government body)
+   - location: Geographic location(s) — city, state, or "Pan-India" / "National" if multi-location
+   - duration: Duration (e.g., "36 months", "3 years") — check the Duration/Validity clause
+   - startDate: Start date in YYYY-MM-DD format (use signing date if no separate start date)
+   - totalBudget: Total budget as a number in INR (null if not mentioned anywhere)
 
 2. **KPIs (Key Performance Indicators):**
-   For each measurable KPI found in the document, extract:
-   - id: Generate a unique ID like "kpi-1", "kpi-2", etc.
-   - name: Name/description of the KPI
-   - targetValue: Numeric target value
-   - unit: Unit of measurement (e.g., "%", "count", "days", "₹")
-   - targetDate: Target completion date in YYYY-MM-DD format (null if not specified)
-   - category: Classify as one of:
-     - "output" — activity-level metric (e.g., people trained, sessions held)
-     - "outcome" — immediate result (e.g., placement rate, satisfaction score)
-     - "impact" — long-term change (e.g., income increase, quality of life)
+   Search ALL sections for any quantifiable commitments, targets, or deliverables. These include:
+   - Explicit numeric targets (e.g., "2 lakh students", "5 centres", "15 partnerships")
+   - Frequency-based commitments (e.g., "quarterly reports" → 4/year, "annual report" → 1/year)
+   - Personnel commitments (e.g., "deploy two fellows" → target: 2)
+   - Event/activity counts (e.g., "national hackathons", "workshops", "training programs")
+   - Infrastructure targets (e.g., "R&D labs", "innovation hubs", "centres of excellence")
+   - Outreach/engagement targets (e.g., "student engagement", "industry partnerships")
+   - Deliverables listed in any "deliverables management" or "role/responsibility" section
 
-Return ONLY valid JSON matching this exact schema, with no additional text or explanation:
+   For deliverables without an explicit number, infer a reasonable annual target from context:
+   - "organize hackathons" with no count → estimate 2-3 per year based on typical CSR programs
+   - "capacity-building workshops" → estimate 8-12 per year
+   - "facilitate industry collaborations" → estimate 5-10 per year
+
+   Aim to extract 8-15 KPIs. If you find fewer than 5, re-read the document — you are likely missing deliverables embedded in role descriptions or scope clauses.
+
+   For each KPI:
+   - id: Generate sequential IDs: "kpi-1", "kpi-2", etc.
+   - name: Clear, concise name (e.g., "Student Outreach & Engagement")
+   - targetValue: Numeric target (annual target if the MoU spans multiple years)
+   - unit: "count", "%", "₹", etc.
+   - targetDate: Target date in YYYY-MM-DD (null if not specified; use MoU end date for overall targets)
+   - category: Classify as:
+     - "output" — activities/deliverables (people trained, events held, reports submitted, fellows deployed, labs set up)
+     - "outcome" — immediate results (placements made, partnerships formed, institutions engaged)
+     - "impact" — long-term systemic change (policy influence, ecosystem development, sustained engagement)
+
+Return ONLY valid JSON matching this exact schema, with no additional text:
 
 {
   "projectDetails": {
@@ -42,8 +60,8 @@ Return ONLY valid JSON matching this exact schema, with no additional text or ex
       "name": "string",
       "targetValue": number,
       "unit": "string",
-      "targetDate": "string" | null,
-      "category": "output" | "outcome" | "impact"
+      "targetDate": "string | null",
+      "category": "output | outcome | impact"
     }
   ]
 }`;

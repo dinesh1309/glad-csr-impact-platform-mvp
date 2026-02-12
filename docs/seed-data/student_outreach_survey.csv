@@ -1,0 +1,81 @@
+Student Name,College,State,Event Type,Event Name,Date,Feedback Score (1-5),Would Recommend (Yes/No)
+Aarav Sharma,IIT Delhi,Delhi,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Priya Patel,NIT Surat,Gujarat,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Rohit Kumar,BITS Pilani,Rajasthan,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Sneha Reddy,JNTU Hyderabad,Telangana,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Amit Singh,DTU Delhi,Delhi,Hackathon,Smart India Hackathon 2025,2025-12-10,5,Yes
+Kavya Nair,CET Trivandrum,Kerala,Workshop,IoT for Social Good,2025-11-28,3,Yes
+Vikram Joshi,COEP Pune,Maharashtra,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Ananya Gupta,IIT Bombay,Maharashtra,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Rajesh Verma,NIT Trichy,Tamil Nadu,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Meera Iyer,RV College Bangalore,Karnataka,Workshop,Green Tech Innovation,2026-01-12,5,Yes
+Suresh Babu,Anna University,Tamil Nadu,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Deepa Menon,NIT Calicut,Kerala,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Arjun Rao,IIIT Hyderabad,Telangana,Hackathon,Smart India Hackathon 2025,2025-12-10,5,Yes
+Pooja Deshmukh,VJTI Mumbai,Maharashtra,Workshop,Sustainability in Tech,2025-11-22,3,No
+Karthik Rajan,PSG Tech Coimbatore,Tamil Nadu,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Nisha Agarwal,IIT Kanpur,Uttar Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Siddharth Malhotra,PEC Chandigarh,Punjab,Hackathon,Innovation Showcase North,2026-02-05,4,Yes
+Divya Krishnan,NIT Warangal,Telangana,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Manish Tiwari,MNNIT Allahabad,Uttar Pradesh,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Lakshmi Sundaram,IIT Madras,Tamil Nadu,Hackathon,Smart India Hackathon 2025,2025-12-10,5,Yes
+Rahul Deshpande,COEP Pune,Maharashtra,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Swati Mishra,NIT Rourkela,Odisha,Workshop,Sustainability in Tech,2025-11-22,3,Yes
+Aditya Kapoor,NSUT Delhi,Delhi,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Riya Saxena,IIT Roorkee,Uttarakhand,Workshop,Green Tech Innovation,2026-01-12,5,Yes
+Vivek Chauhan,NIT Jaipur,Rajasthan,Workshop,AI & ML Fundamentals,2025-11-15,4,Yes
+Shruti Pandey,BHU Varanasi,Uttar Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Gaurav Sinha,IIT Kharagpur,West Bengal,Hackathon,Innovation Showcase East,2026-01-28,4,Yes
+Neha Sharma,LNM Jaipur,Rajasthan,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Akash Dubey,VNIT Nagpur,Maharashtra,Workshop,Sustainability in Tech,2025-11-22,5,Yes
+Tanvi Kulkarni,Walchand Sangli,Maharashtra,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Harsh Vardhan,IIT Guwahati,Assam,Workshop,Green Tech Innovation,2026-01-12,5,Yes
+Pallavi Jain,IIIT Bangalore,Karnataka,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Nikhil Reddy,CBIT Hyderabad,Telangana,Workshop,AI & ML Fundamentals,2025-11-15,3,Yes
+Aparna Das,NIT Durgapur,West Bengal,Hackathon,Innovation Showcase East,2026-01-28,5,Yes
+Varun Mehta,DA-IICT Gandhinagar,Gujarat,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Jyoti Kumari,NIT Patna,Bihar,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Pranav Goyal,Thapar University,Punjab,Hackathon,Innovation Showcase North,2026-02-05,5,Yes
+Sakshi Bhatt,IIT Mandi,Himachal Pradesh,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Om Prakash,NIT Jamshedpur,Jharkhand,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Ishita Banerjee,Jadavpur University,West Bengal,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Abhinav Mishra,IIIT Allahabad,Uttar Pradesh,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Kritika Singh,MNIT Jaipur,Rajasthan,Workshop,IoT for Social Good,2025-11-28,5,Yes
+Rohan Pillai,GEC Thrissur,Kerala,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Aishwarya Rao,RVCE Bangalore,Karnataka,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Dhruv Patel,SVNIT Surat,Gujarat,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Megha Srivastava,IIT BHU,Uttar Pradesh,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Tushar Garg,NIT Kurukshetra,Haryana,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Sonal Verma,LNMIIT Jaipur,Rajasthan,Hackathon,Innovation Showcase North,2026-02-05,3,Yes
+Pawan Kumar,NIT Hamirpur,Himachal Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Anjali Nair,Model Engineering Kochi,Kerala,Workshop,IoT for Social Good,2025-11-28,5,Yes
+Mohit Sharma,MAIT Delhi,Delhi,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Bhavya Gupta,IIT Indore,Madhya Pradesh,Hackathon,Smart India Hackathon 2025,2025-12-10,5,Yes
+Shikha Pandey,HBTU Kanpur,Uttar Pradesh,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Raghav Mittal,IIIT Delhi,Delhi,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Preeti Kumari,BIT Mesra,Jharkhand,Workshop,AI & ML Fundamentals,2025-11-15,5,Yes
+Aman Jha,NIT Silchar,Assam,Hackathon,Innovation Showcase East,2026-01-28,4,Yes
+Ritika Bose,Heritage Institute Kolkata,West Bengal,Workshop,IoT for Social Good,2025-11-28,3,No
+Naveen Kumar,SASTRA Thanjavur,Tamil Nadu,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Chitra Ramesh,SSN College Chennai,Tamil Nadu,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Karan Arora,Chitkara University,Punjab,Hackathon,Innovation Showcase North,2026-02-05,4,Yes
+Shweta Tiwari,SGSITS Indore,Madhya Pradesh,Workshop,Green Tech Innovation,2026-01-12,5,Yes
+Yash Agrawal,DAIICT Gandhinagar,Gujarat,Workshop,AI & ML Fundamentals,2025-11-15,4,Yes
+Smriti Das,NIT Agartala,Tripura,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Ankit Rawat,GBP Pauri,Uttarakhand,Hackathon,Smart India Hackathon 2025,2025-12-10,3,Yes
+Poornima Hegde,NIE Mysuru,Karnataka,Workshop,Sustainability in Tech,2025-11-22,5,Yes
+Sahil Khan,AMU Aligarh,Uttar Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes
+Vandana Yadav,MANIT Bhopal,Madhya Pradesh,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Ashutosh Misra,IIT Dhanbad,Jharkhand,Hackathon,Innovation Showcase East,2026-01-28,5,Yes
+Nandini Rao,BMSCE Bangalore,Karnataka,Workshop,AI & ML Fundamentals,2025-11-15,4,Yes
+Tarun Sethi,NIT Jalandhar,Punjab,Workshop,IoT for Social Good,2025-11-28,5,Yes
+Payal Gupta,IGDTUW Delhi,Delhi,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Alok Pandey,MNNIT Allahabad,Uttar Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,5,Yes
+Ramya Srinivasan,CEG Anna University,Tamil Nadu,Workshop,Green Tech Innovation,2026-01-12,4,Yes
+Kunal Desai,LDCE Ahmedabad,Gujarat,Workshop,Sustainability in Tech,2025-11-22,4,Yes
+Simran Kaur,GNDEC Ludhiana,Punjab,Hackathon,Innovation Showcase North,2026-02-05,5,Yes
+Abhishek Tripathi,KNIT Sultanpur,Uttar Pradesh,Workshop,AI & ML Fundamentals,2025-11-15,3,Yes
+Darshana Pillai,TKM Kollam,Kerala,Workshop,IoT for Social Good,2025-11-28,4,Yes
+Mayank Gupta,JIIT Noida,Uttar Pradesh,Hackathon,Smart India Hackathon 2025,2025-12-10,4,Yes
+Rashi Sharma,Amity Noida,Uttar Pradesh,Workshop,Green Tech Innovation,2026-01-12,5,Yes
+Deepak Rajput,IIITM Gwalior,Madhya Pradesh,Internship Drive,CSR Industry Connect,2025-10-20,4,Yes

@@ -7,6 +7,7 @@ import { AIStatusIndicator } from "./AIStatusIndicator";
 import { StageStepper } from "./StageStepper";
 import { StageContainer } from "./StageContainer";
 import { MoUUpload } from "@/components/stage1-mou/MoUUpload";
+import { ReportUpload } from "@/components/stage2-progress/ReportUpload";
 
 export function AppShell() {
   const project = useStore((s) => s.getActiveProject());
@@ -74,6 +75,8 @@ export function AppShell() {
       >
         {project.currentStage === 1 ? (
           <MoUUpload />
+        ) : project.currentStage === 2 ? (
+          <ReportUpload />
         ) : (
           <StagePlaceholder stage={project.currentStage} />
         )}

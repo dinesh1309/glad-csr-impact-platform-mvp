@@ -1,0 +1,112 @@
+{
+  "success": true,
+  "data": {
+    "projectDetails": {
+      "projectName": "CSR Projects Facilitation Unit (CPFU)",
+      "ngoName": "CSRBOX Group",
+      "location": "Pan-India",
+      "duration": "3 years",
+      "startDate": "2025-09-12",
+      "totalBudget": null
+    },
+    "kpis": [
+      {
+        "id": "kpi-1",
+        "name": "Establishment of CSR Facilitation Unit at AICTE",
+        "targetValue": 1,
+        "unit": "unit",
+        "targetDate": "2025-09-12",
+        "category": "output"
+      },
+      {
+        "id": "kpi-2",
+        "name": "Deployment of Two CSR Fellows at AICTE",
+        "targetValue": 2,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-3",
+        "name": "Mobilization of CSR Funding and Corporate Partnerships",
+        "targetValue": null,
+        "unit": "amount",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-4",
+        "name": "Creation of 2 lakh+ student engagements annually",
+        "targetValue": 200000,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-5",
+        "name": "Establishment of Centres of Excellence in AICTE approved institutions",
+        "targetValue": null,
+        "unit": "count",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-6",
+        "name": "Organization of national hackathons and innovation showcases",
+        "targetValue": 2,
+        "unit": "event",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-7",
+        "name": "Facilitation of industry-academia collaborations for real-world project integration",
+        "targetValue": 5,
+        "unit": "collaboration",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-8",
+        "name": "Design and management of national hackathons and innovation showcases",
+        "targetValue": 2,
+        "unit": "event",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-9",
+        "name": "Submission of quarterly and annual reports to AICTE",
+        "targetValue": 4,
+        "unit": "report",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-10",
+        "name": "Ensure strict data privacy compliance under IT Act, 2000 and AICTE guidelines",
+        "targetValue": 1,
+        "unit": "compliance",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-11",
+        "name": "Creation of communication material, impact reports, and success stories to enhance CPFU visibility",
+        "targetValue": null,
+        "unit": "material",
+        "targetDate": null,
+        "category": "output"
+      },
+      {
+        "id": "kpi-12",
+        "name": "Submission of documentation of hackathons, innovations, and research outcomes",
+        "targetValue": null,
+        "unit": "document",
+        "targetDate": null,
+        "category": "output"
+      }
+    ]
+  },
+  "provider": "ollama"
+}

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Upload, FileText, AlertCircle, RotateCcw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
+import { getSelectedProvider } from "@/components/shell/AIStatusIndicator";
 import { ProjectDetailsCard } from "./ProjectDetailsCard";
 import { KPIList } from "./KPIList";
 import type { ProjectDetails, KPI } from "@/lib/types";
@@ -45,8 +46,15 @@ export function MoUUpload() {
         const formData = new FormData();
         formData.append("file", file);
 
+        const headers: HeadersInit = {};
+        const provider = getSelectedProvider();
+        if (provider !== "auto") {
+          headers["x-ai-provider"] = provider;
+        }
+
         const res = await fetch("/api/extract/mou", {
           method: "POST",
+          headers,
           body: formData,
         });
 
