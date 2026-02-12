@@ -49,8 +49,8 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 2 | AI Extraction Infrastructure | Done | Feb 11 | Feb 11 |
 | 3 | Project Dashboard + App Shell + Base Components (Module 0) | Done | Feb 11 | Feb 11 |
 | 4 | Module 1 — MoU Upload | Done | Feb 11 | Feb 11 |
-| 5 | Module 2 — Progress Reports | In Progress | Feb 12 | — |
-| 6 | Module 3 — Field Evidence | Not Started | — | — |
+| 5 | Module 2 — Progress Reports | Done | Feb 12 | Feb 12 |
+| 6 | Module 3 — Field Evidence | Done | Feb 12 | Feb 12 |
 | 7 | Module 4 — SROI Calculation | Not Started | — | — |
 | 8 | Module 5 — Report Generation | Not Started | — | — |
 | 9 | Polish & Exhibition Prep (UI/UX Verification) | Not Started | — | — |
@@ -184,7 +184,7 @@ This is where the multi-project dashboard and premium visual identity get built 
 | 5.8 | Gap highlighting (visual emphasis on behind-target KPIs) | Done | Behind KPIs sorted first + red warning banner |
 | 5.9 | Manual override for extracted values | Done | Hover pencil icon, inline edit with recalculation |
 | 5.10 | Wire to Zustand store (Reports slice, reads KPIs from Module 1) | Done | computeProgressData aggregates across all reports |
-| 5.11 | Push → verify deployment | Not Started | |
+| 5.11 | Push → verify deployment | Done | Pushed to main, Vercel auto-deploys |
 | | **CHECKPOINT:** Full Stage 1→2 flow with animated progress bars on live URL | | |
 
 ---
@@ -195,17 +195,17 @@ This is where the multi-project dashboard and premium visual identity get built 
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 6.1 | Create `EvidenceUpload.tsx` using shared UploadZone (PDF, CSV, images) | Not Started | |
-| 6.2 | File type detection (auto-categorize: Survey, Photo, Document) | Not Started | |
-| 6.3 | Create `EvidenceCard.tsx` (thumbnail + KPI tags + left color border) | Not Started | Blue=survey, Green=photo, Gray=document |
-| 6.4 | Photo thumbnails (Base64 conversion, displayed in card) | Not Started | |
-| 6.5 | CSV summary (row count, column summary via papaparse) | Not Started | |
-| 6.6 | KPI linking dropdown (link evidence to KPIs) | Not Started | |
-| 6.7 | Wire to `POST /api/extract/evidence` for validation | Not Started | |
-| 6.8 | Create `ValidationSummary.tsx` (verified / discrepancy / no-evidence) | Not Started | |
-| 6.9 | Evidence count summary (KPIs with/without linked evidence) | Not Started | |
-| 6.10 | Notes field per evidence item | Not Started | |
-| 6.11 | Wire to Zustand store (Evidence slice) | Not Started | |
+| 6.1 | Create `EvidenceUpload.tsx` using shared UploadZone (PDF, CSV, images) | Done | Multi-type drag-drop, accepts PDF/CSV/JPG/PNG |
+| 6.2 | File type detection (auto-categorize: Survey, Photo, Document) | Done | Auto-detect from MIME type and extension |
+| 6.3 | Create `EvidenceCard.tsx` (thumbnail + KPI tags + left color border) | Done | Blue=survey, Green=photo, Gray=document, 4px left border |
+| 6.4 | Photo thumbnails (Base64 conversion, displayed in card) | Done | FileReader → Base64 data URL in card |
+| 6.5 | CSV summary (row count, column summary via papaparse) | Done | Lightweight line-count parser, shows row count |
+| 6.6 | KPI linking dropdown (link evidence to KPIs) | Done | Checkbox dropdown, tags with remove, multi-select |
+| 6.7 | Wire to `POST /api/extract/evidence` for validation | Done | Sends metadata + KPI data, receives ValidationResult[] |
+| 6.8 | Create `ValidationSummary.tsx` (verified / discrepancy / no-evidence) | Done | Table with status badges, match %, evidence count |
+| 6.9 | Evidence count summary (KPIs with/without linked evidence) | Done | "X of Y KPIs have linked evidence" bar |
+| 6.10 | Notes field per evidence item | Done | Toggle notes textarea per card |
+| 6.11 | Wire to Zustand store (Evidence slice) | Done | files[] + validationResults[] in evidence slice |
 | 6.12 | Push → verify deployment | Not Started | |
 | | **CHECKPOINT:** Full Stage 1→2→3 flow works on live URL | | |
 

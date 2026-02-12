@@ -8,6 +8,7 @@ import { StageStepper } from "./StageStepper";
 import { StageContainer } from "./StageContainer";
 import { MoUUpload } from "@/components/stage1-mou/MoUUpload";
 import { ReportUpload } from "@/components/stage2-progress/ReportUpload";
+import { EvidenceUpload } from "@/components/stage3-evidence/EvidenceUpload";
 
 export function AppShell() {
   const project = useStore((s) => s.getActiveProject());
@@ -77,6 +78,8 @@ export function AppShell() {
           <MoUUpload />
         ) : project.currentStage === 2 ? (
           <ReportUpload />
+        ) : project.currentStage === 3 ? (
+          <EvidenceUpload />
         ) : (
           <StagePlaceholder stage={project.currentStage} />
         )}
