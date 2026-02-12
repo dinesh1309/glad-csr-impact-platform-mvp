@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileText, AlertCircle, RotateCcw, Loader2 } from "lucide-react";
+import { Upload, FileText, AlertCircle, RotateCcw, Loader2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { getSelectedProvider } from "@/components/shell/AIStatusIndicator";
@@ -25,6 +25,7 @@ export function MoUUpload() {
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [showReUploadWarning, setShowReUploadWarning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
@@ -105,6 +106,21 @@ export function MoUUpload() {
   );
 
   const handleReUpload = () => {
+    // If already confirmed, show warning first
+    if (state === "confirmed" || project?.mou.isConfirmed) {
+      setShowReUploadWarning(true);
+      return;
+    }
+    doReUpload();
+  };
+
+  const doReUpload = () => {
+    const hasDownstreamData =
+      project &&
+      (project.reports.progressData.length > 0 ||
+        project.evidence.files.length > 0 ||
+        project.sroi.calculatedRatio !== null);
+
     updateActiveProject((p) => ({
       ...p,
       mou: {
@@ -115,10 +131,32 @@ export function MoUUpload() {
         isConfirmed: false,
       },
       stageStatus: { ...p.stageStatus, stage1Complete: false },
+      // Clear downstream data that was linked to old KPIs
+      ...(hasDownstreamData
+        ? {
+            reports: { files: p.reports.files, progressData: [] },
+            evidence: { files: p.evidence.files, validationResults: [] },
+            sroi: {
+              investment: p.sroi.investment,
+              outcomes: [],
+              adjustments: p.sroi.adjustments,
+              calculatedRatio: null,
+            },
+            report: { generatedAt: null },
+            stageStatus: {
+              stage1Complete: false,
+              stage2Complete: false,
+              stage3Complete: false,
+              stage4Complete: false,
+              stage5Complete: false,
+            },
+          }
+        : {}),
     }));
     setState("empty");
     setError(null);
     setProvider(null);
+    setShowReUploadWarning(false);
   };
 
   const handleConfirm = () => {
@@ -279,12 +317,10 @@ export function MoUUpload() {
                     )}
                   </div>
                 </div>
-                {!project.mou.isConfirmed && (
-                  <Button variant="outline" size="sm" onClick={handleReUpload}>
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    Re-upload
-                  </Button>
-                )}
+                <Button variant="outline" size="sm" onClick={handleReUpload}>
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  {project.mou.isConfirmed ? "Upload Revised MoU" : "Re-upload"}
+                </Button>
               </motion.div>
 
               {/* Project Details Card */}
@@ -345,6 +381,84 @@ export function MoUUpload() {
               </motion.div>
             </motion.div>
           )}
+      </AnimatePresence>
+
+      {/* Re-upload warning modal */}
+      <AnimatePresence>
+        {showReUploadWarning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => setShowReUploadWarning(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-warning/10">
+                  <AlertTriangle className="h-5 w-5 text-warning" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-dark">
+                    Upload Revised MoU?
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    Uploading a new MoU will replace the current KPIs. The following
+                    linked data will be reset:
+                  </p>
+                  <ul className="mt-3 space-y-1.5 text-sm text-body">
+                    {project!.reports.progressData.length > 0 && (
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                        Progress data ({project!.reports.progressData.length} KPI
+                        matchings)
+                      </li>
+                    )}
+                    {project!.evidence.validationResults.length > 0 && (
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                        Evidence validation results
+                      </li>
+                    )}
+                    {project!.sroi.calculatedRatio !== null && (
+                      <li className="flex items-center gap-2">
+                        <span className="h-1.5 w-1.5 rounded-full bg-warning" />
+                        SROI calculation (ratio:{" "}
+                        {project!.sroi.calculatedRatio.toFixed(2)})
+                      </li>
+                    )}
+                  </ul>
+                  <p className="mt-3 text-xs text-muted">
+                    Uploaded files (reports, evidence) will be kept — only KPI-linked
+                    data is reset. You can re-process them after the new MoU is confirmed.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowReUploadWarning(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-warning text-white hover:bg-warning/90"
+                  onClick={doReUpload}
+                >
+                  Replace MoU
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
