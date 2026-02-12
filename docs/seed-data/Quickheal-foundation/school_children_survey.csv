@@ -1,0 +1,26 @@
+Survey_ID,School_Name,Student_Name,Class,Age,Date_Surveyed,Q1_Know_Phishing,Q2_Strong_Password,Q3_Social_Media_Privacy,Q4_Report_Cyberbullying,Q5_Safe_Browsing,Pre_Score,Post_Score,Improvement
+S001,ZP High School Latur,Rajesh Kumar,8,13,2022-07-20,Yes,Yes,No,Yes,Yes,2,4,100%
+S002,ZP High School Latur,Priyanka Deshmukh,9,14,2022-07-20,Yes,Yes,Yes,Yes,Yes,3,5,67%
+S003,ZP High School Latur,Suresh Pawar,7,12,2022-07-20,No,Yes,No,No,Yes,1,3,200%
+S004,KV Latur,Ananya Sharma,8,13,2022-07-21,Yes,Yes,Yes,Yes,No,3,4,33%
+S005,KV Latur,Vikram Singh,9,14,2022-07-21,Yes,No,No,Yes,Yes,2,4,100%
+S006,KV Latur,Meera Joshi,10,15,2022-07-21,Yes,Yes,Yes,Yes,Yes,4,5,25%
+S007,St Mary School Latur,Aditya Patel,8,13,2022-07-22,No,No,Yes,No,Yes,1,3,200%
+S008,St Mary School Latur,Riya Kulkarni,9,14,2022-07-22,Yes,Yes,No,Yes,Yes,3,5,67%
+S009,Shivaji High School,Santosh Gaikwad,7,12,2022-07-23,No,No,No,No,Yes,0,3,Inf
+S010,Shivaji High School,Pooja More,8,13,2022-07-23,Yes,No,No,Yes,No,1,3,200%
+S011,ZP School Ausa,Ramesh Bhosale,9,14,2022-07-24,No,Yes,No,No,Yes,1,4,300%
+S012,ZP School Ausa,Sunita Jadhav,8,13,2022-07-24,Yes,Yes,No,Yes,Yes,3,5,67%
+S013,Mahatma Gandhi Vidyalaya,Ganesh Shinde,10,15,2022-07-25,Yes,No,Yes,Yes,Yes,3,4,33%
+S014,Mahatma Gandhi Vidyalaya,Lata Kamble,9,14,2022-07-25,No,No,No,Yes,No,0,2,Inf
+S015,New English School Latur,Akash Deshpande,8,13,2022-07-26,Yes,Yes,Yes,Yes,Yes,4,5,25%
+S016,New English School Latur,Neha Patil,9,14,2022-07-26,Yes,Yes,No,Yes,Yes,3,5,67%
+S017,ZP School Udgir,Vijay Sonawane,7,12,2022-07-27,No,No,No,No,No,0,2,Inf
+S018,ZP School Udgir,Anjali Wagh,8,13,2022-07-27,No,Yes,No,No,Yes,1,3,200%
+S019,Model School Nilanga,Sachin Mane,9,14,2022-07-28,Yes,No,No,Yes,Yes,2,4,100%
+S020,Model School Nilanga,Kavita Suryawanshi,10,15,2022-07-28,Yes,Yes,Yes,Yes,No,3,4,33%
+S021,Sarvodaya Vidyalaya,Deepak Jagtap,8,13,2022-07-29,No,No,Yes,No,Yes,1,3,200%
+S022,Sarvodaya Vidyalaya,Asha Pawar,9,14,2022-07-29,Yes,Yes,No,Yes,Yes,3,5,67%
+S023,Pratibha Vidyalaya,Rahul Waghmare,7,12,2022-07-30,No,No,No,No,No,0,2,Inf
+S024,Pratibha Vidyalaya,Manisha Gawli,8,13,2022-07-30,Yes,No,No,Yes,Yes,2,4,100%
+S025,Saraswati Vidya Mandir,Nikhil Deshpande,9,14,2022-07-31,Yes,Yes,Yes,Yes,Yes,4,5,25%
