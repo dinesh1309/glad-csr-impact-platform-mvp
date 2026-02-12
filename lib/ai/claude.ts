@@ -84,6 +84,7 @@ export async function extractTextWithClaude(
 
 /**
  * Quick connectivity check — verifies the API key works.
+ * Uses models.list (free, no token cost) with a 3s timeout.
  */
 export async function checkClaudeHealth(): Promise<{
   available: boolean;
@@ -91,12 +92,13 @@ export async function checkClaudeHealth(): Promise<{
 }> {
   const start = Date.now();
   try {
-    // Use a minimal request to check connectivity
-    await getClient().messages.create({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 10,
-      messages: [{ role: "user", content: "ping" }],
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    await getClient().models.list(
+      { limit: 1 },
+      { signal: controller.signal }
+    );
+    clearTimeout(timeout);
     return { available: true, latency: Date.now() - start };
   } catch {
     return { available: false, latency: Date.now() - start };

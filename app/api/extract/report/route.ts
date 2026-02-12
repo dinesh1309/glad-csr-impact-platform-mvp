@@ -67,9 +67,10 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error.message : "Extraction failed";
     console.error("Report extraction error:", error);
 
+    const isNoProvider = message.includes("No AI provider");
     return NextResponse.json(
-      { success: false, error: message, canRetry: true },
-      { status: 422 }
+      { success: false, error: message, canRetry: !isNoProvider },
+      { status: isNoProvider ? 503 : 422 }
     );
   }
 }

@@ -46,9 +46,10 @@ export async function POST(request: NextRequest) {
       error instanceof Error ? error.message : "Evidence analysis failed";
     console.error("Evidence analysis error:", error);
 
+    const isNoProvider = message.includes("No AI provider");
     return NextResponse.json(
-      { success: false, error: message, canRetry: true },
-      { status: 422 }
+      { success: false, error: message, canRetry: !isNoProvider },
+      { status: isNoProvider ? 503 : 422 }
     );
   }
 }
