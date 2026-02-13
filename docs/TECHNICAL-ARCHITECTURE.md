@@ -1,7 +1,7 @@
 # Technical Architecture Document
 ## CSR Impact Assessment Platform — MVP
 
-**Version:** 3.0
+**Version:** 3.1
 **Date:** February 2026
 **Status:** Draft — Pending Review
 
@@ -187,7 +187,7 @@ Document content:
 
 Before sending to the AI model, PDFs need text extraction:
 - **For Claude API:** Send the PDF as base64 directly (Claude supports PDF input natively)
-- **For Ollama:** Extract text server-side using `pdf-parse` library, then send text to the model
+- **For Ollama:** Extract text server-side using `unpdf` library, then send text to the model
 
 #### Health Check Endpoint
 
@@ -314,7 +314,7 @@ glad-csr-impact-platform-mvp/
 │       ├── claude.ts             # Claude API integration
 │       ├── ollama.ts             # Ollama integration
 │       ├── prompts.ts            # Extraction prompt templates (shared by both)
-│       └── pdf-parser.ts         # PDF text extraction for Ollama (pdf-parse)
+│       └── pdf-parser.ts         # PDF text extraction for Ollama (unpdf)
 │
 ├── .env.local                    # API keys (not committed)
 │   # ANTHROPIC_API_KEY=sk-ant-...
@@ -394,7 +394,7 @@ function getActiveProvider():
 
 ```
 - Uses Ollama REST API (http://localhost:11434/api/generate)
-- PDFs must be pre-processed: extract text using pdf-parse library
+- PDFs must be pre-processed: extract text using unpdf library
 - Sends extracted text + prompt to the model
 - Model: mistral (7B) — good at structured output, runs on 8GB RAM
 - Alternative: llama3 (8B) — if mistral is unavailable
@@ -695,18 +695,21 @@ return stages[project.currentStage];
 
 | Package | Version | Purpose | Size Impact |
 |---------|---------|---------|-------------|
-| next | ^14 | Framework (App Router, API routes) | — (build tool) |
-| react / react-dom | ^18 | UI library | — (peer dep) |
-| tailwindcss | ^3 | Styling | — (build tool) |
-| zustand | ^4 | State management | ~1KB gzip |
-| @anthropic-ai/sdk | ^0.30 | Claude API client | ~15KB gzip |
-| @react-pdf/renderer | ^3 | PDF generation | ~200KB gzip |
-| pdf-parse | ^1.1 | PDF text extraction (for Ollama path) | ~5KB gzip |
+| next | 16.x | Framework (App Router, API routes) | — (build tool) |
+| react / react-dom | 19.x | UI library | — (peer dep) |
+| tailwindcss | ^4 | Styling (CSS-based `@theme inline`, not config file) | — (build tool) |
+| zustand | ^5 | State management | ~1KB gzip |
+| @anthropic-ai/sdk | ^0.74 | Claude API client | ~15KB gzip |
+| @react-pdf/renderer | ^4.3 | PDF generation (React 19 compatible) | ~200KB gzip |
+| unpdf | ^1.4 | PDF text extraction (for Ollama path) | ~5KB gzip |
+| undici | ^7.21 | Custom fetch dispatcher (extended Ollama timeouts) | ~5KB gzip |
 | papaparse | ^5 | CSV parsing | ~7KB gzip |
-| lucide-react | latest | Icons | Tree-shakeable |
-| framer-motion | latest | Animations & transitions | ~32KB gzip |
+| lucide-react | ^0.563 | Icons | Tree-shakeable |
+| framer-motion | ^12 | Animations & transitions | ~32KB gzip |
 
 **Not using a chart library.** Sparkline charts (Stage 2 trend lines) are implemented as lightweight hand-coded SVG components (~30 lines). This saves ~45KB vs Recharts and keeps animations consistent with Framer Motion. Can be revisited post-MVP if complex visualizations are needed.
+
+> **Note (v3.1):** `pdf-parse` was replaced by `unpdf` during development — `unpdf` is server-friendly (no web worker dependency) and works reliably in Vercel serverless functions. `undici` was added to extend Node's built-in fetch timeout for large Ollama extractions.
 
 ### 10.2 shadcn/ui Components (Not a Dependency)
 
@@ -1067,15 +1070,19 @@ These are **not built** in MVP but the architecture accommodates them:
 
 | # | Item | Decision | Status |
 |---|------|----------|--------|
-| 1 | Node.js version | 18+ (LTS) | Confirmed |
+| 1 | Node.js version | 22+ (LTS) | Confirmed |
 | 2 | Package manager | **npm** — zero extra setup, universal compatibility, all docs/tutorials assume it | Confirmed |
-| 3 | Next.js version | 14 (App Router) | Confirmed |
-| 4 | Ollama model | **Mistral 7B** — best JSON compliance, lighter RAM (~6GB), faster responses. Reliable fallback for exhibition demos. | Confirmed |
-| 5 | Claude model | **Claude Sonnet 4.5** (`claude-sonnet-4-5-20250929`) — best balance of speed, quality, and cost for document extraction | Confirmed |
-| 6 | Currency | Indian Rupees (INR) throughout | Confirmed |
-| 7 | Sparkline charts (Module 2) | **Lightweight SVG** — hand-coded `<polyline>` component (~30 lines). Zero bundle cost, Framer Motion compatible, full design system control. Recharts can be evaluated post-MVP if more complex visualizations are needed. | Confirmed |
-| 8 | Exhibition hardware | Unknown — architecture supports 8GB+ RAM (Mistral 7B needs ~6GB) | Pending |
-| 9 | Connectivity check interval | Every 30 seconds | Confirmed |
+| 3 | Next.js version | **16** (App Router) | Confirmed |
+| 4 | React version | **19** | Confirmed |
+| 5 | Tailwind CSS version | **v4** (CSS-based `@theme inline`, not tailwind.config.ts) | Confirmed |
+| 6 | Zustand version | **5** | Confirmed |
+| 7 | Ollama model | **Mistral 7B** — best JSON compliance, lighter RAM (~6GB), faster responses. Reliable fallback for exhibition demos. | Confirmed |
+| 8 | Claude model | **Claude Sonnet 4.5** (`claude-sonnet-4-5-20250929`) — best balance of speed, quality, and cost for document extraction | Confirmed |
+| 9 | Currency | Indian Rupees (INR) throughout | Confirmed |
+| 10 | Sparkline charts (Module 2) | **Lightweight SVG** — hand-coded `<polyline>` component (~30 lines). Zero bundle cost, Framer Motion compatible, full design system control. Recharts can be evaluated post-MVP if more complex visualizations are needed. | Confirmed |
+| 11 | PDF text extraction | **unpdf** — server-friendly, no web worker dependency. Replaced pdf-parse during development. | Confirmed |
+| 12 | Exhibition hardware | Unknown — architecture supports 8GB+ RAM (Mistral 7B needs ~6GB) | Pending |
+| 13 | Connectivity check interval | Every 30 seconds | Confirmed |
 
 ---
 
@@ -1086,3 +1093,5 @@ These are **not built** in MVP but the architecture accommodates them:
 *v2.1 changes: All open decisions resolved — npm, Claude Sonnet 4.5, Mistral 7B, Lightweight SVG for sparklines. Section 17 updated from "Open Decisions" to "Confirmed Decisions." Framer Motion added to dependencies table. Sparkline approach documented.*
 
 *v3.0 changes: Multi-project architecture. Added project dashboard, Project entity wrapping all module data, two-level navigation (dashboard + project), multi-project Zustand store, dashboard components in project structure. Removed "Multi-project support" from Future Considerations (now in scope).*
+
+*v3.1 changes: Updated dependency versions to match actual installed packages (Next 16, React 19, Tailwind v4, Zustand 5). Replaced pdf-parse with unpdf. Added undici to deps table. Updated §17 confirmed decisions.*
