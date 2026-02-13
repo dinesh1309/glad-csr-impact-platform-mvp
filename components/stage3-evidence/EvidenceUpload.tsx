@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { getSelectedProvider } from "@/components/shell/AIStatusIndicator";
 import { EvidenceCard } from "./EvidenceCard";
 import { ValidationSummary } from "./ValidationSummary";
-import type { EvidenceFile, ValidationResult } from "@/lib/types";
+import type { EvidenceFile, KPI, ValidationResult } from "@/lib/types";
 
 const ACCEPTED_TYPES = [
   "application/pdf",
@@ -47,12 +47,82 @@ async function parseCSVMeta(
   }
 }
 
+/** Read CSV content summary for AI (header + first 3 rows). */
+async function readCSVSummary(file: File): Promise<string> {
+  try {
+    const text = await file.text();
+    const lines = text.trim().split("\n");
+    const preview = lines.slice(0, 4).join("\n");
+    return `CSV file "${file.name}" (${lines.length - 1} data rows)\nHeader + sample rows:\n${preview}`;
+  } catch {
+    return `CSV file "${file.name}"`;
+  }
+}
+
+/** Build a rich CSV summary with column aggregates + full data for AI validation. */
+async function buildCSVValidationSummary(file: File): Promise<string | undefined> {
+  try {
+    const text = await file.text();
+    const lines = text.trim().split("\n");
+    if (lines.length < 2) return undefined;
+
+    const headers = lines[0].split(",").map((h) => h.trim());
+    const dataRows = lines.slice(1);
+
+    // Compute aggregates for numeric columns
+    const stats: Record<string, { sum: number; count: number; min: number; max: number }> = {};
+    for (const row of dataRows) {
+      const values = row.split(",").map((v) => v.trim());
+      headers.forEach((header, i) => {
+        const num = parseFloat(values[i]);
+        if (!isNaN(num) && isFinite(num)) {
+          if (!stats[header]) stats[header] = { sum: 0, count: 0, min: num, max: num };
+          stats[header].sum += num;
+          stats[header].count++;
+          stats[header].min = Math.min(stats[header].min, num);
+          stats[header].max = Math.max(stats[header].max, num);
+        }
+      });
+    }
+
+    let summary = `CSV "${file.name}" — ${dataRows.length} data rows\n`;
+    summary += `Columns: ${headers.join(", ")}\n`;
+
+    const aggLines = Object.entries(stats).map(
+      ([col, s]) =>
+        `  ${col}: sum=${s.sum}, count=${s.count}, avg=${(s.sum / s.count).toFixed(1)}, min=${s.min}, max=${s.max}`
+    );
+    if (aggLines.length > 0) {
+      summary += `Numeric column aggregates:\n${aggLines.join("\n")}\n`;
+    }
+
+    // Include full data for small CSVs, sample for large ones
+    if (dataRows.length <= 100) {
+      summary += `\nFull data:\n${text}`;
+    } else {
+      summary += `\nSample (first 10 rows):\n${lines.slice(0, 11).join("\n")}`;
+    }
+
+    return summary;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Build KPI list string for the suggestion API. */
+function buildKpiListString(kpis: KPI[]): string {
+  return kpis
+    .map((k) => `- ${k.id}: ${k.name} (target: ${k.targetValue} ${k.unit}, category: ${k.category})`)
+    .join("\n");
+}
+
 export function EvidenceUpload() {
   const project = useStore((s) => s.getActiveProject());
   const updateActiveProject = useStore((s) => s.updateActiveProject);
 
   const [dragOver, setDragOver] = useState(false);
   const [validating, setValidating] = useState(false);
+  const [suggestingIds, setSuggestingIds] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isLocked = project?.stageStatus.stage3Complete ?? false;
@@ -69,28 +139,47 @@ export function EvidenceUpload() {
       );
       if (validFiles.length === 0) return;
 
-      // Build evidence entries with metadata
-      const newEntries: EvidenceFile[] = await Promise.all(
-        validFiles.map(async (file) => {
-          const fileType = detectFileType(file);
-          const thumbnail = await readImageThumbnail(file);
-          const csvMeta =
-            fileType === "survey" ? await parseCSVMeta(file) : null;
+      // Build evidence entries with metadata + capture file content for AI
+      const entriesWithContent: { entry: EvidenceFile; fileInfo: string }[] =
+        await Promise.all(
+          validFiles.map(async (file) => {
+            const fileType = detectFileType(file);
+            const thumbnail = await readImageThumbnail(file);
+            const csvMeta =
+              fileType === "survey" ? await parseCSVMeta(file) : null;
 
-          return {
-            id: crypto.randomUUID(),
-            fileName: file.name,
-            fileType,
-            uploadedAt: new Date().toISOString(),
-            linkedKpiIds: [],
-            notes: null,
-            thumbnail,
-            metadata: {
-              ...(csvMeta ? { rowCount: csvMeta.rowCount } : {}),
-            },
-          };
-        })
-      );
+            // Parse content for AI suggestion (must happen before File is lost)
+            const fileInfo =
+              fileType === "survey"
+                ? await readCSVSummary(file)
+                : `${fileType} file "${file.name}"`;
+
+            // Build rich CSV summary for later validation
+            const contentSummary =
+              fileType === "survey"
+                ? await buildCSVValidationSummary(file)
+                : undefined;
+
+            return {
+              entry: {
+                id: crypto.randomUUID(),
+                fileName: file.name,
+                fileType,
+                uploadedAt: new Date().toISOString(),
+                linkedKpiIds: [],
+                notes: null,
+                thumbnail,
+                metadata: {
+                  ...(csvMeta ? { rowCount: csvMeta.rowCount } : {}),
+                  ...(contentSummary ? { contentSummary } : {}),
+                },
+              },
+              fileInfo,
+            };
+          })
+        );
+
+      const newEntries = entriesWithContent.map((e) => e.entry);
 
       updateActiveProject((p) => ({
         ...p,
@@ -99,6 +188,58 @@ export function EvidenceUpload() {
           files: [...p.evidence.files, ...newEntries],
         },
       }));
+
+      // Fire async KPI suggestion for each file (non-blocking)
+      const kpis = project.mou.kpis;
+      if (kpis.length > 0) {
+        const kpiList = buildKpiListString(kpis);
+        const provider = getSelectedProvider();
+        const validKpiIds = new Set(kpis.map((k) => k.id));
+
+        for (const { entry, fileInfo } of entriesWithContent) {
+          setSuggestingIds((prev) => new Set(prev).add(entry.id));
+
+          fetch("/api/suggest-kpis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              fileInfo,
+              kpiList,
+              ...(provider !== "auto" ? { providerOverride: provider } : {}),
+            }),
+          })
+            .then((res) => res.json())
+            .then((json) => {
+              if (json.success && Array.isArray(json.kpiIds) && json.kpiIds.length > 0) {
+                // Filter to only valid KPI IDs from this project
+                const matched = json.kpiIds.filter((id: string) => validKpiIds.has(id));
+                if (matched.length > 0) {
+                  updateActiveProject((p) => ({
+                    ...p,
+                    evidence: {
+                      ...p.evidence,
+                      files: p.evidence.files.map((f) =>
+                        f.id === entry.id
+                          ? { ...f, linkedKpiIds: [...new Set([...f.linkedKpiIds, ...matched])] }
+                          : f
+                      ),
+                    },
+                  }));
+                }
+              }
+            })
+            .catch((err) => {
+              console.error(`KPI suggestion failed for ${entry.fileName}:`, err);
+            })
+            .finally(() => {
+              setSuggestingIds((prev) => {
+                const next = new Set(prev);
+                next.delete(entry.id);
+                return next;
+              });
+            });
+        }
+      }
     },
     [project, isLocked, updateActiveProject]
   );
@@ -146,17 +287,23 @@ export function EvidenceUpload() {
         (f) => f.linkedKpiIds.length > 0
       );
 
-      // Build evidence metadata string
+      // Build evidence metadata string — include CSV content summaries for AI
       const evidenceMetadata = linkedFiles
         .map(
-          (f) =>
-            `- ${f.fileName} (${f.fileType}): linked to KPIs [${f.linkedKpiIds.join(", ")}]` +
-            (f.metadata.rowCount != null
-              ? `, ${f.metadata.rowCount} data rows`
-              : "") +
-            (f.notes ? `, notes: "${f.notes}"` : "")
+          (f) => {
+            let meta =
+              `- ${f.fileName} (${f.fileType}): linked to KPIs [${f.linkedKpiIds.join(", ")}]` +
+              (f.metadata.rowCount != null
+                ? `, ${f.metadata.rowCount} data rows`
+                : "") +
+              (f.notes ? `, notes: "${f.notes}"` : "");
+            if (f.metadata.contentSummary) {
+              meta += `\n  DATA SUMMARY:\n  ${f.metadata.contentSummary.split("\n").join("\n  ")}`;
+            }
+            return meta;
+          }
         )
-        .join("\n");
+        .join("\n\n");
 
       // Build KPI data with reported values from progress data
       const kpis = project.mou.kpis;
@@ -320,6 +467,7 @@ export function EvidenceUpload() {
                   evidence={evidence}
                   kpis={kpis}
                   isLocked={isLocked}
+                  isSuggesting={suggestingIds.has(evidence.id)}
                   onUpdate={handleUpdateEvidence}
                   onDelete={() => handleDeleteEvidence(evidence.id)}
                 />

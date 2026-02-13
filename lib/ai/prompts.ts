@@ -102,13 +102,31 @@ Return ONLY valid JSON matching this exact schema:
 }`;
 }
 
+export function buildKpiSuggestionPrompt(
+  fileInfo: string,
+  kpiList: string
+): string {
+  return `You are analyzing an uploaded evidence file for a CSR project.
+
+File details:
+${fileInfo}
+
+The project tracks these KPIs:
+${kpiList}
+
+Which KPIs does this evidence file provide data for? Only return KPI IDs where
+the file content clearly relates to that metric. Be selective — do not guess.
+
+Return ONLY valid JSON: { "kpiIds": ["kpi-1", "kpi-3"] }`;
+}
+
 export function buildEvidenceAnalysisPrompt(
   evidenceMetadata: string,
   linkedKpiData: string
 ): string {
   return `You are validating field evidence for a CSR project impact assessment.
 
-The following evidence files have been uploaded and linked to KPIs:
+The following evidence files have been uploaded and linked to KPIs. Each file may include a DATA SUMMARY with column aggregates (sum, count, avg, min, max) and the full CSV data:
 
 ${evidenceMetadata}
 
@@ -116,17 +134,25 @@ The linked KPIs and their reported values are:
 
 ${linkedKpiData}
 
+IMPORTANT — How to extract evidence values from data:
+- Use column aggregates (sums, counts) to derive evidence values. For example:
+  - A "Children_Attended" column with sum=869 across 31 rows means the evidence shows 869 children reached.
+  - A "Digital_Downloads" column with sum=338 means 338 downloads evidenced.
+  - Pre/Post score columns can be used to compute improvement percentages.
+- The evidence is a SAMPLE of field data — it may cover only a portion of the full project. A sample that is directionally consistent with reported values (even if the absolute number is lower) should be considered supporting evidence.
+- Compare evidence values against reported values. If the evidence is a clear sample/subset, assess whether it is consistent with the reported scale.
+
 For each KPI that has linked evidence, assess whether the evidence supports the reported values:
 
 - kpiId: The KPI ID
 - kpiName: The KPI name
-- reportedValue: The value reported in progress reports
-- evidenceValue: The value you can extract/infer from the evidence (null if not determinable)
-- matchPercentage: How closely the evidence matches the reported value as a percentage (null if not determinable)
+- reportedValue: The value reported in progress reports (use 0 if N/A)
+- evidenceValue: The value you extracted/computed from the evidence data (null only if no data columns relate to this KPI)
+- matchPercentage: How closely the evidence supports the reported value as a percentage (null only if evidenceValue is null)
 - status: One of:
-  - "verified" — evidence supports the reported value (within 20% margin)
-  - "discrepancy" — evidence contradicts the reported value (>20% difference)
-  - "no-evidence" — insufficient evidence to validate
+  - "verified" — evidence is consistent with and supports the reported value
+  - "discrepancy" — evidence clearly contradicts the reported value
+  - "no-evidence" — no data in the evidence files relates to this KPI
 - evidenceCount: Number of evidence files linked to this KPI
 
 Return ONLY valid JSON matching this exact schema:

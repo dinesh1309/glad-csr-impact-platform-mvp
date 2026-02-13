@@ -70,6 +70,7 @@ export interface EvidenceFile {
   thumbnail: string | null; // Base64 for images
   metadata: {
     rowCount?: number; // For CSVs
+    contentSummary?: string; // CSV headers + aggregates + data for AI validation
     location?: string; // For photos with EXIF
     dateTaken?: string;
   };
