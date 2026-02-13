@@ -1,8 +1,8 @@
 # Master Task List
 ## CSR Impact Assessment Platform — MVP
 
-**Last Updated:** February 11, 2026
-**Status:** Step 8 — Complete (all 5 modules built)
+**Last Updated:** February 13, 2026
+**Status:** Steps 1-8 Complete, Evidence validation bug fixed, Step 10 (Portfolio Analytics) planned
 
 ---
 
@@ -54,6 +54,7 @@ Step 9:  UI/UX Strategy used as a CHECKLIST to verify:
 | 7 | Module 4 — SROI Calculation | Done | Feb 12 | Feb 12 |
 | 8 | Module 5 — Report Generation | Done | 10/11 | Push pending |
 | 9 | Polish & Exhibition Prep (UI/UX Verification) | Not Started | — | — |
+| 10 | Portfolio Analytics (Dashboard Inline) | Not Started | — | — |
 
 ---
 
@@ -200,8 +201,9 @@ This is where the multi-project dashboard and premium visual identity get built 
 | 6.3 | Create `EvidenceCard.tsx` (thumbnail + KPI tags + left color border) | Done | Blue=survey, Green=photo, Gray=document, 4px left border |
 | 6.4 | Photo thumbnails (Base64 conversion, displayed in card) | Done | FileReader → Base64 data URL in card |
 | 6.5 | CSV summary (row count, column summary via papaparse) | Done | Lightweight line-count parser, shows row count |
+| 6.5b | Store CSV content summary with column aggregates at upload time | Done | `buildCSVValidationSummary()` — sum/count/avg/min/max per numeric column + full data for small CSVs |
 | 6.6 | KPI linking dropdown (link evidence to KPIs) | Done | Checkbox dropdown, tags with remove, multi-select |
-| 6.7 | Wire to `POST /api/extract/evidence` for validation | Done | Sends metadata + KPI data, receives ValidationResult[] |
+| 6.7 | Wire to `POST /api/extract/evidence` for validation | Done | Sends metadata + CSV content summaries + KPI data, receives ValidationResult[] |
 | 6.8 | Create `ValidationSummary.tsx` (verified / discrepancy / no-evidence) | Done | Table with status badges, match %, evidence count |
 | 6.9 | Evidence count summary (KPIs with/without linked evidence) | Done | "X of Y KPIs have linked evidence" bar |
 | 6.10 | Notes field per evidence item | Done | Toggle notes textarea per card |
@@ -302,6 +304,33 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 
 ---
 
+## Step 10: Portfolio Analytics (Dashboard Inline)
+
+**Docs referenced:** PRD (§4A Portfolio Analytics) + Technical Architecture (§3, §7) + UI/UX Strategy (§5 Component Styling)
+
+Aggregated metrics across all projects, rendered inline on the Project Dashboard above the project cards grid. Visible when 1+ projects exist.
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| | **Data Layer** | | |
+| 10.1 | Create `lib/portfolio-analytics.ts` — pure computation functions | Not Started | computePortfolioSummary, computeSROIComparison, computeRiskItems, computeEvidenceCoverage, formatINR |
+| | **Components** | | |
+| 10.2 | Create `components/dashboard/analytics/SummaryMetricCards.tsx` — 5 metric cards | Not Started | Total Investment, Portfolio SROI (dark/gold), Total Social Value, KPI Health, Pipeline Mini |
+| 10.3 | Create `components/dashboard/analytics/SROIComparisonChart.tsx` — horizontal bar chart | Not Started | SVG bars, color-coded by ratio, Framer Motion fill animation |
+| 10.4 | Create `components/dashboard/analytics/PipelineFunnel.tsx` — stage distribution | Not Started | 5 horizontal bars with stage accent colors |
+| 10.5 | Create `components/dashboard/analytics/EvidenceCoverageMeter.tsx` — progress bar | Not Started | Single bar with percentage, color tiers |
+| 10.6 | Create `components/dashboard/analytics/RiskBanner.tsx` — conditional warning | Not Started | Red banner listing projects with behind-target KPIs |
+| | **Integration** | | |
+| 10.7 | Create `components/dashboard/PortfolioAnalytics.tsx` — container component | Not Started | Reads store, useMemo computations, composes all sub-components |
+| 10.8 | Modify `components/dashboard/ProjectDashboard.tsx` — add PortfolioAnalytics | Not Started | Single import + JSX insertion above project grid |
+| | **Testing** | | |
+| 10.9 | Visual QA — test with 1, 3, and 5+ projects at various stages | Not Started | Verify metrics, animations, edge cases |
+| 10.10 | Responsive testing — desktop, tablet, mobile widths | Not Started | 5-col → 2-col → 1-col grid for metric cards |
+| 10.11 | Push → verify deployment | Not Started | |
+| | **CHECKPOINT:** Dashboard shows portfolio analytics with all 5 components, responsive, animated | | |
+
+---
+
 ## Issues / Blockers Log
 
 | # | Date | Issue | Resolution | Status |
@@ -309,6 +338,7 @@ This step walks through the UI/UX Strategy section by section to verify everythi
 | 1 | Feb 11 | pdf-parse v3 API changed from function to class-based | Updated to `new PDFParse({ data })` + `.getText()` | Resolved |
 | 2 | Feb 11 | Vercel 500 — pdf-parse/pdfjs-dist fails at module-level import in serverless | Lazy dynamic `import()` in provider.ts; lazy Anthropic client in claude.ts | Resolved |
 | 3 | Feb 11 | Vercel Deployment Protection blocking public access (401) | Disabled Vercel Authentication for production | Resolved |
+| 4 | Feb 13 | Evidence validation returning "no-evidence" / "not validated" for all KPIs despite reports + evidence uploaded | Validation was only sending file metadata (name, row count) to AI — not actual CSV content. AI had no data to validate against. Fixed by storing CSV content summary with column aggregates at upload time and including it in the validation request. Also improved AI prompt to use aggregates and treat sample data as supporting evidence. | Resolved |
 
 ---
 
