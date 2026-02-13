@@ -64,9 +64,182 @@ function createKPITable(doc, kpis) {
   doc.fillColor("#334155");
 }
 
+function createTargetTable(doc, kpis) {
+  const startX = 50;
+  const colWidths = [30, 260, 80, 80, 62];
+  const headers = ["#", "Key Performance Indicator", "Target", "Unit", "Category"];
+
+  let y = doc.y;
+  doc.rect(startX, y, 512, 22).fill("#0891B2");
+  let x = startX;
+  headers.forEach((h, i) => {
+    doc.fontSize(9).fillColor("#FFFFFF").text(h, x + 5, y + 6, { width: colWidths[i] - 10 });
+    x += colWidths[i];
+  });
+  y += 22;
+
+  kpis.forEach((kpi, idx) => {
+    const rowColor = idx % 2 === 0 ? "#FFFFFF" : "#F8FAFC";
+    doc.rect(startX, y, 512, 20).fill(rowColor);
+
+    const row = [String(idx + 1), kpi.name, String(kpi.target), kpi.unit, kpi.category];
+    x = startX;
+    row.forEach((val, i) => {
+      doc.fontSize(8.5).fillColor("#334155").text(val, x + 5, y + 5, { width: colWidths[i] - 10 });
+      x += colWidths[i];
+    });
+    y += 20;
+  });
+
+  doc.y = y + 10;
+  doc.fillColor("#334155");
+}
+
 function p(doc, text) {
   doc.fontSize(10).fillColor("#334155").text(text, 50, doc.y, { width: 512, lineGap: 3 });
   doc.moveDown(0.5);
+}
+
+// ============================================================
+// MoU: Memorandum of Understanding
+// ============================================================
+function generateMoU() {
+  const doc = new PDFDocument({ size: "A4", margins: { top: 50, bottom: 50, left: 50, right: 50 } });
+  const stream = fs.createWriteStream(path.join(outDir, "MOUQuickHealFoundation.pdf"));
+  doc.pipe(stream);
+
+  // Title block
+  doc.rect(0, 0, 612, 70).fill("#0F172A");
+  doc.fontSize(18).fillColor("#FFFFFF").text("MEMORANDUM OF UNDERSTANDING", 50, 20, { width: 512, align: "center" });
+  doc.fontSize(10).fillColor("#94A3B8").text("Quick Heal Foundation × Rajarshi Shahu Mahavidyalaya (Autonomous), Latur", 50, 46, { width: 512, align: "center" });
+  doc.moveDown(3);
+  doc.fillColor("#334155");
+
+  p(doc,
+    'This Memorandum of Understanding ("MOU") is made and entered into on this 11th day of May, 2022 ("Effective Date") by and between:'
+  );
+  p(doc,
+    'Quick Heal Foundation, a trust registered under the provisions of Bombay Public Trusts Act, 1950 and having its registered office at Quick Heal Foundation, S. No. 207/1A, Marvel Edge, C building, 7th floor, Office no. 7010, Viman Nagar, Pune 411 014, Maharashtra, India (hereinafter referred to as "QHF").'
+  );
+  p(doc, "AND");
+  p(doc,
+    'Rajarshi Shahu Mahavidyalaya (Autonomous), Latur, having its headquarters at Opp. Central Bus Stand, Kaku Seth Ukka Marg, Chandra Nagar, Latur, Maharashtra, 413512 (hereinafter referred to as "the Institute").'
+  );
+
+  createSectionHeader(doc, "WHEREAS");
+  p(doc,
+    "1. QHF is a non-profit organization engaged in executing Corporate Social Responsibility (\"CSR\") initiatives of Quick Heal Technologies Limited (\"QHTL\") including but not limited to promotion of cyber security and promotion of education."
+  );
+  p(doc,
+    "2. The Institute is affiliated to Swami Ramanand Teerth Marathwada University."
+  );
+  p(doc,
+    "3. QHF desires to collaborate with the Institute on a non-exclusive basis to promote its CSR objectives."
+  );
+  p(doc,
+    "4. The Parties wish to enter into this MOU in order to record their intent and understanding for the collaboration."
+  );
+
+  createSectionHeader(doc, "1. Scope");
+  p(doc,
+    "The Parties have entered into this MOU on a non-exclusive basis in order to carry out such responsibilities, as more particularly detailed in Annexure A of this MOU."
+  );
+
+  createSectionHeader(doc, "2. Term and Termination");
+  p(doc,
+    "This MOU will be valid and binding on the Parties for a period of one year commencing from the Effective Date unless otherwise terminated. Either Party may terminate this MOU for convenience by providing a written notice of thirty (30) days to the other Party."
+  );
+
+  createSectionHeader(doc, "3. Confidentiality");
+  p(doc,
+    "Any information exchanged between the Parties, which is of proprietary and confidential nature, whether or not marked as such, will be treated as Confidential Information."
+  );
+
+  createSectionHeader(doc, "4. Governing Law");
+  p(doc,
+    "This MOU will be governed by the laws of India. The Parties submit themselves to the exclusive jurisdiction of the courts of Pune, India."
+  );
+
+  doc.moveDown(1);
+  p(doc, "For Quick Heal Foundation:");
+  p(doc, "Name: Mr. Ajay Shirke, Program Manager");
+  doc.moveDown(0.5);
+  p(doc, "For Rajarshi Shahu Mahavidyalaya (Autonomous), Latur:");
+  p(doc, "Name: Dr. Mahadev Gavhane, Principal");
+
+  // ---- ANNEXURE A ----
+  doc.addPage();
+  doc.rect(0, 0, 612, 70).fill("#0F172A");
+  doc.fontSize(18).fillColor("#FFFFFF").text("ANNEXURE A — SCOPE & KPI FRAMEWORK", 50, 20, { width: 512, align: "center" });
+  doc.fontSize(10).fillColor("#94A3B8").text("Earn & Learn: Cyber Security Awareness Campaign", 50, 46, { width: 512, align: "center" });
+  doc.moveDown(3);
+  doc.fillColor("#334155");
+
+  createSectionHeader(doc, "1. Project Details");
+  p(doc, "Project Name: Earn & Learn: Cyber Security Awareness Campaign");
+  p(doc, "Eligibility: Computer Science students (BCA / B.Sc. CS)");
+  p(doc,
+    "Objective: To appoint IT students as volunteers and groom them by giving required training of personality development which includes public speaking skills, confidence building, presentation skills and team building, and spread cyber security awareness among school children through them."
+  );
+  p(doc, "Project Duration: 1 year (May 2022 — May 2023)");
+  p(doc, "Location: Latur district, Maharashtra");
+
+  createSectionHeader(doc, "2. Project Timeline");
+  p(doc, "Week 1 — Volunteer Training");
+  p(doc, "Week 2 — Mock / Demo sessions");
+  p(doc, "Week 3 — Approval for activities");
+  p(doc, "Week 4 to Week 12 — Presentation delivery, leaflet downloads, field activities");
+  p(doc, "Week 13, 14 — Report submission");
+  p(doc, "Week 21 — Conclave");
+
+  createSectionHeader(doc, "3. Key Performance Indicators (KPI Targets)");
+  p(doc,
+    "The following KPI targets have been mutually agreed between QHF and the Institute as of 20th May 2022. Progress will be tracked against these targets in periodic M&E reports."
+  );
+
+  const kpiTargets = [
+    { name: "Student Volunteers Recruited", target: 60, unit: "count", category: "Output" },
+    { name: "Volunteer Training Sessions Conducted", target: 5, unit: "sessions", category: "Output" },
+    { name: "Mock/Demo Sessions Completed", target: 10, unit: "sessions", category: "Output" },
+    { name: "Presentations Delivered to Schools", target: 300, unit: "presentations", category: "Output" },
+    { name: "School Children Reached", target: 9000, unit: "children", category: "Outcome" },
+    { name: "Cyber Security Awareness Leaflet Downloads", target: 6000, unit: "downloads", category: "Outcome" },
+    { name: "Faculty Coordinators Appointed", target: 5, unit: "count", category: "Output" },
+    { name: "M&E Reports Submitted", target: 3, unit: "reports", category: "Output" },
+    { name: "Improvement in Cyber Security Awareness (pre-post survey)", target: 50, unit: "%", category: "Impact" },
+    { name: "Volunteer Skill Development (self-assessment)", target: 70, unit: "%", category: "Impact" },
+  ];
+
+  createTargetTable(doc, kpiTargets);
+
+  createSectionHeader(doc, "4. Project Cost & Disbursement");
+  p(doc,
+    "1. Rs. 600/- Stipend per presentation for student volunteer working under Earn & Learn scheme and successfully completed 5 presentations. The number of presentations and participants shall be mutually decided by the Parties."
+  );
+  p(doc,
+    "2. Rs. 200/- per presentation for faculty / college to monitor conduction of successful presentations by students and reporting in prescribed format to QHF."
+  );
+  p(doc,
+    "3. Disbursement of payment will be done only after verification of required documents in stipulated time. Upon successful completion, QHF shall transfer payments to the bank account of the Institute."
+  );
+
+  createSectionHeader(doc, "5. Roles and Responsibilities");
+  p(doc, "QHF shall: Provide training to selected volunteers; Provide required material; Appoint coordinator for M&E; Make payment to Institute; Upload activities for voting; Conduct conclave.");
+  p(doc, "The Institute shall: Provide student volunteers; Provide faculty coordinators and SPoC (1 per 10 teams); Ensure presentations per QHF guidelines; Encourage leaflet downloads; Submit timely M&E reports; Distribute stipend payments.");
+
+  doc.moveDown(2);
+  doc.fontSize(9).fillColor("#64748B").text(
+    "Signed: Mr. Ajay Shirke (QHF Program Manager) | Dr. Mahadev Gavhane (Principal, RSM Latur)",
+    50, doc.y, { width: 512, align: "center" }
+  );
+  doc.moveDown(0.5);
+  doc.fontSize(9).text(
+    "Date: 11th May 2022 | Witnessed by: Sugandha Dani (QHF) & Prof. Jyoti Mashalkar (RSM Latur)",
+    50, doc.y, { width: 512, align: "center" }
+  );
+
+  doc.end();
+  return new Promise((resolve) => stream.on("finish", resolve));
 }
 
 // ============================================================
@@ -98,6 +271,7 @@ function generateMidReport() {
   p(doc, "Location: Latur, Maharashtra");
   p(doc, "MoU Duration: 1 year (May 2022 — May 2023)");
   p(doc, "Reporting Period: May 2022 — July 2022 (Week 1–8)");
+  p(doc, "KPI Targets: As mutually agreed between QHF and the Institute on 20th May 2022 per MoU Clause 2, Annexure A.");
 
   createSectionHeader(doc, "3. Key Performance Indicators — Progress");
 
@@ -191,7 +365,8 @@ function generateFinalReport() {
   p(doc, "Location: Latur, Maharashtra");
   p(doc, "MoU Duration: 1 year (May 2022 — May 2023)");
   p(doc, "Reporting Period: May 2022 — October 2022 (Week 1–14)");
-  p(doc, "Total Stipend Budget: Rs. 2,23,200 (312 presentations × Rs. 600 + faculty monitoring)");
+  p(doc, "Total Stipend Budget: Rs. 2,49,600 (312 presentations × Rs. 600 stipend + Rs. 200 faculty monitoring)");
+  p(doc, "KPI Targets: As mutually agreed between QHF and the Institute on 20th May 2022 per MoU Clause 2, Annexure A.");
 
   createSectionHeader(doc, "3. Key Performance Indicators — Final Status");
 
@@ -266,6 +441,9 @@ function generateFinalReport() {
 // Run
 async function main() {
   console.log("Generating Quick Heal Foundation seed data PDFs...\n");
+
+  await generateMoU();
+  console.log("  Created: MOUQuickHealFoundation.pdf");
 
   await generateMidReport();
   console.log("  Created: QHF_Progress_Report_Week8_Jul2022.pdf");

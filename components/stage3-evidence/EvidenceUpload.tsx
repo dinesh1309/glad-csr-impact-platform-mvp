@@ -16,7 +16,7 @@ const ACCEPTED_TYPES = [
   "image/jpeg",
   "image/png",
 ];
-const MAX_SIZE = 10 * 1024 * 1024;
+const MAX_SIZE = 4.5 * 1024 * 1024; // Vercel serverless body limit
 
 function detectFileType(file: File): EvidenceFile["fileType"] {
   if (file.type === "text/csv" || file.name.endsWith(".csv")) return "survey";
@@ -96,12 +96,9 @@ async function buildCSVValidationSummary(file: File): Promise<string | undefined
       summary += `Numeric column aggregates:\n${aggLines.join("\n")}\n`;
     }
 
-    // Include full data for small CSVs, sample for large ones
-    if (dataRows.length <= 100) {
-      summary += `\nFull data:\n${text}`;
-    } else {
-      summary += `\nSample (first 10 rows):\n${lines.slice(0, 11).join("\n")}`;
-    }
+    // Include sample data — cap at 20 rows to stay within Vercel's 4.5MB body limit
+    const sampleLimit = Math.min(dataRows.length, 20);
+    summary += `\nSample (first ${sampleLimit} rows):\n${lines.slice(0, sampleLimit + 1).join("\n")}`;
 
     return summary;
   } catch {

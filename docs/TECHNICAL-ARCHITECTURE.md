@@ -255,7 +255,15 @@ glad-csr-impact-platform-mvp/
 │   ├── dashboard/
 │   │   ├── ProjectDashboard.tsx  # Landing page: project list + create new
 │   │   ├── ProjectCard.tsx       # Individual project card with status summary
-│   │   └── CreateProjectDialog.tsx # Dialog for creating a new project
+│   │   ├── CreateProjectDialog.tsx # Dialog for creating a new project
+│   │   ├── PortfolioAnalytics.tsx  # Container: reads store, computes metrics, composes analytics sub-components
+│   │   │
+│   │   └── analytics/              # Portfolio analytics sub-components
+│   │       ├── SummaryMetricCards.tsx     # 5 top-level metric cards (investment, SROI, social value, KPI health, pipeline)
+│   │       ├── SROIComparisonChart.tsx    # Horizontal SVG bar chart comparing project SROI ratios
+│   │       ├── PipelineFunnel.tsx         # Stage distribution showing project counts per stage
+│   │       ├── EvidenceCoverageMeter.tsx  # Progress bar showing portfolio-wide evidence verification rate
+│   │       └── RiskBanner.tsx             # Conditional warning banner for behind-target KPIs
 │   │
 │   ├── shell/
 │   │   ├── AppShell.tsx          # Main layout: header + stepper + content area (per project)
@@ -307,6 +315,7 @@ glad-csr-impact-platform-mvp/
 │   ├── types.ts                  # All TypeScript interfaces
 │   ├── mock-data.ts              # Fallback mock data (only if both AI providers fail)
 │   ├── calculations.ts           # SROI calculation (pure functions)
+│   ├── portfolio-analytics.ts    # Portfolio aggregation (pure functions: summary, SROI comparison, risk, evidence coverage)
 │   ├── utils.ts                  # Shared utilities (cn helper, formatters)
 │   │
 │   └── ai/                       # AI extraction logic (server-side only)
@@ -611,6 +620,27 @@ Edit Mode:     input field + save/cancel buttons
 ```
 
 This is implemented as a controlled component that toggles between display and edit modes. This allows users to correct any AI extraction errors.
+
+### 7.5 Portfolio Analytics Container Pattern
+
+The dashboard includes an inline analytics section that aggregates data across all projects.
+
+```
+PortfolioAnalytics (container — reads store, useMemo computations)
+  ├── SummaryMetricCards        # 5 metric cards: investment, SROI, social value, KPI health, pipeline
+  ├── SROIComparisonChart       # Horizontal SVG bar chart comparing projects
+  ├── PipelineFunnel            # Stage distribution (project counts per stage 1-5)
+  ├── EvidenceCoverageMeter     # Portfolio-wide evidence verification progress
+  └── RiskBanner                # Conditional: only renders if behind-target KPIs exist
+```
+
+**Data layer**: Pure functions in `lib/portfolio-analytics.ts` take `Project[]` and return derived metrics. No new store slices — uses `useMemo` in the container to avoid persist/partialize complications.
+
+**Key functions**: `computePortfolioSummary()`, `computeSROIComparison()`, `computeRiskItems()`, `computeEvidenceCoverage()`, `formatINR()`.
+
+**Visibility**: Renders when 1+ projects exist. With 0 projects, returns null.
+
+**Charts**: Lightweight inline SVG (same approach as sparklines in Module 2) with Framer Motion animations. No chart library dependency.
 
 ---
 
@@ -1062,7 +1092,7 @@ These are **not built** in MVP but the architecture accommodates them:
 | Authentication | Add Next.js middleware + auth provider wrapping the app. |
 | Real-time collaboration | Replace Zustand with a synced store (e.g., Liveblocks). |
 | Caching extractions | Add a cache layer in the API routes to avoid re-processing the same document. |
-| Portfolio analytics | Add a cross-project view that aggregates SROI and progress data from all projects. |
+| ~~Portfolio analytics~~ | ~~Add a cross-project view that aggregates SROI and progress data from all projects.~~ (Moved into scope — see §7.5) |
 
 ---
 
@@ -1086,7 +1116,7 @@ These are **not built** in MVP but the architecture accommodates them:
 
 ---
 
-**End of Technical Architecture Document v3.0**
+**End of Technical Architecture Document v3.2**
 
 *v2 changes: Real AI extraction with Claude API + Ollama hybrid approach, offline-first exhibition support, Next.js server mode with API routes.*
 
@@ -1095,3 +1125,5 @@ These are **not built** in MVP but the architecture accommodates them:
 *v3.0 changes: Multi-project architecture. Added project dashboard, Project entity wrapping all module data, two-level navigation (dashboard + project), multi-project Zustand store, dashboard components in project structure. Removed "Multi-project support" from Future Considerations (now in scope).*
 
 *v3.1 changes: Updated dependency versions to match actual installed packages (Next 16, React 19, Tailwind v4, Zustand 5). Replaced pdf-parse with unpdf. Added undici to deps table. Updated §17 confirmed decisions.*
+
+*v3.2 changes: Portfolio Analytics added to scope. New files in §3: `lib/portfolio-analytics.ts`, `components/dashboard/analytics/` (5 sub-components), `PortfolioAnalytics.tsx` container. New §7.5 documenting container pattern. "Portfolio analytics" struck from §16 Future Considerations.*

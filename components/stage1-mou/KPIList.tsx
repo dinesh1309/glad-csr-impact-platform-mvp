@@ -1,11 +1,17 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KPICard } from "./KPICard";
 import type { KPI } from "@/lib/types";
+
+const CATEGORIES: { key: KPI["category"]; label: string; description: string; dot: string }[] = [
+  { key: "output", label: "Outputs", description: "Activities and deliverables", dot: "bg-teal" },
+  { key: "outcome", label: "Outcomes", description: "Immediate results and changes", dot: "bg-success" },
+  { key: "impact", label: "Impact", description: "Long-term systemic change", dot: "bg-gold" },
+];
 
 interface KPIListProps {
   kpis: KPI[];
@@ -18,6 +24,16 @@ function generateId() {
 }
 
 export function KPIList({ kpis, isLocked, onUpdate }: KPIListProps) {
+  const grouped = useMemo(() => {
+    const map = new Map<KPI["category"], KPI[]>();
+    for (const kpi of kpis) {
+      const list = map.get(kpi.category) ?? [];
+      list.push(kpi);
+      map.set(kpi.category, list);
+    }
+    return map;
+  }, [kpis]);
+
   const handleUpdateKPI = useCallback(
     (updated: KPI) => {
       onUpdate(kpis.map((k) => (k.id === updated.id ? updated : k)));
@@ -84,25 +100,45 @@ export function KPIList({ kpis, isLocked, onUpdate }: KPIListProps) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <AnimatePresence initial={false}>
-              {kpis.map((kpi) => (
-                <motion.div
-                  key={kpi.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <KPICard
-                    kpi={kpi}
-                    isLocked={isLocked}
-                    onUpdate={handleUpdateKPI}
-                    onDelete={() => handleDeleteKPI(kpi.id)}
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+          <div className="space-y-5">
+            {CATEGORIES.map((cat) => {
+              const items = grouped.get(cat.key);
+              if (!items || items.length === 0) return null;
+              return (
+                <div key={cat.key}>
+                  {/* Category header */}
+                  <div className="mb-3 flex items-center gap-2">
+                    <span className={`inline-block h-2.5 w-2.5 rounded-full ${cat.dot}`} />
+                    <h4 className="text-sm font-semibold text-dark">{cat.label}</h4>
+                    <span className="rounded-full bg-light-gray px-1.5 py-0.5 text-[10px] font-medium text-muted">
+                      {items.length}
+                    </span>
+                    <span className="text-xs text-muted">{cat.description}</span>
+                  </div>
+                  {/* Cards grid */}
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <AnimatePresence initial={false}>
+                      {items.map((kpi) => (
+                        <motion.div
+                          key={kpi.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <KPICard
+                            kpi={kpi}
+                            isLocked={isLocked}
+                            onUpdate={handleUpdateKPI}
+                            onDelete={() => handleDeleteKPI(kpi.id)}
+                          />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

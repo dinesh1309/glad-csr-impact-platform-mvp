@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Tag,
   X,
+  Loader2,
 } from "lucide-react";
 import type { EvidenceFile, KPI } from "@/lib/types";
 
@@ -38,6 +39,7 @@ interface EvidenceCardProps {
   evidence: EvidenceFile;
   kpis: KPI[];
   isLocked: boolean;
+  isSuggesting?: boolean;
   onUpdate: (updated: EvidenceFile) => void;
   onDelete: () => void;
 }
@@ -46,6 +48,7 @@ export function EvidenceCard({
   evidence,
   kpis,
   isLocked,
+  isSuggesting = false,
   onUpdate,
   onDelete,
 }: EvidenceCardProps) {
@@ -171,6 +174,13 @@ export function EvidenceCard({
               </span>
             );
           })}
+
+          {isSuggesting && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-stage-3/10 px-2 py-0.5 text-[11px] font-medium text-stage-3">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Linking KPIs...
+            </span>
+          )}
 
           {!isLocked && (
             <div className="relative" ref={dropdownRef}>

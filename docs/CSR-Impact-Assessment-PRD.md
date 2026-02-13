@@ -165,6 +165,158 @@ interface Project {
 
 ---
 
+## 4A. Portfolio Analytics (Dashboard Inline)
+
+### 4A.1 Purpose
+
+Provides CSR managers with an at-a-glance portfolio view — aggregated metrics across all projects — without opening individual projects. Renders inline on the Project Dashboard (§4) above the project cards grid. Visible when 1+ projects exist.
+
+### 4A.2 User Flow
+
+```
+Landing Page → View Portfolio Analytics (summary cards, SROI comparison, pipeline, evidence coverage, risk alerts) → Drill into individual project
+```
+
+### 4A.3 Features
+
+| Feature ID | Feature | Description | Priority |
+|------------|---------|-------------|----------|
+| PA-F1 | Summary Metric Cards | Row of 5 cards: Total Investment (₹), Portfolio SROI (weighted avg), Total Social Value, KPI Health (on-track/at-risk/behind counts), Pipeline Mini (stage distribution) | Must Have |
+| PA-F2 | SROI Comparison Chart | Horizontal bar chart comparing SROI ratios across all projects. Color-coded: green (>3x), gold (1-3x), red (<1x) | Must Have |
+| PA-F3 | Pipeline Funnel | Stage distribution — how many projects are at each stage (1-5). Uses stage accent colors | Should Have |
+| PA-F4 | Evidence Coverage Meter | Progress bar showing portfolio-wide evidence verification rate (X of Y KPIs verified) | Should Have |
+| PA-F5 | Risk Banner | Warning banner highlighting projects with behind-target KPIs. Only visible if any project has "behind" status | Should Have |
+
+### 4A.4 Data Schemas
+
+```typescript
+interface PortfolioSummary {
+  totalInvestment: number;          // Sum of project.sroi.investment across all projects
+  portfolioSROI: number | null;     // totalAdjustedValue / totalInvestment (weighted avg)
+  totalSocialValue: number;         // Sum of adjusted outcome values (afterDropoff)
+  kpiHealth: {
+    onTrack: number;                // Count of KPIs with status "on-track" across all projects
+    atRisk: number;
+    behind: number;
+    total: number;
+  };
+  stageCounts: Record<1 | 2 | 3 | 4 | 5, number>;  // Project count per stage
+}
+
+interface SROIComparisonItem {
+  projectId: string;
+  projectName: string;
+  ratio: number;                    // From project.sroi.calculatedRatio
+  color: "green" | "gold" | "red";  // >3x, 1-3x, <1x
+}
+
+interface RiskItem {
+  projectId: string;
+  projectName: string;
+  behindCount: number;              // Count of "behind" KPIs in this project
+  atRiskCount: number;
+}
+
+interface EvidenceCoverage {
+  verifiedCount: number;            // KPIs with "verified" validation across all projects
+  totalKpiCount: number;            // Total KPIs across all projects
+  percentage: number;
+  color: "green" | "gold" | "red";  // >80%, 50-80%, <50%
+}
+```
+
+All data is derived from existing `Project` fields — no new storage or API calls required.
+
+### 4A.5 Data Sources (per metric)
+
+| Metric | Source Field | Aggregation |
+|--------|-------------|-------------|
+| Total Investment | `project.sroi.investment` | SUM across projects |
+| Portfolio SROI | `project.sroi.outcomes[]` + `investment` + `adjustments` | Weighted: total adjusted value / total investment |
+| Total Social Value | Computed via `calculateSROI()` → `afterDropoff` | SUM across projects |
+| KPI Health | `project.reports.progressData[].status` | COUNT by status |
+| Pipeline | `project.currentStage` | COUNT per stage value |
+| SROI Comparison | `project.sroi.calculatedRatio` | Per-project, sorted descending |
+| Risk Items | `project.reports.progressData[].status === "behind"` | COUNT per project, filter > 0 |
+| Evidence Coverage | `project.evidence.validationResults[].status === "verified"` | COUNT / total KPIs |
+
+### 4A.6 UI Specifications
+
+**Layout (inline on dashboard, above project cards):**
+
+```
+┌─── PORTFOLIO OVERVIEW ──────────────────────────────────────────┐
+│                                                                  │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────┐ │
+│  │ Total    │ │ SROI     │ │ Social   │ │ KPI      │ │ Pipe │ │
+│  │ Invest.  │ │(dark/gold)│ │ Value    │ │ Health   │ │ line │ │
+│  │ ₹2.4 Cr │ │  3.21x   │ │ ₹7.7 Cr │ │ ●18 ●5 ●3│ │▌▌▌▌▌│ │
+│  └──────────┘ └──────────┘ └──────────┘ └──────────┘ └──────┘ │
+│                                                                  │
+│  ┌── SROI by Project ──────────┐  ┌── Pipeline Stages ────────┐ │
+│  │ Rural Education  ████████ 4.2x │  │ MoU Upload    ██  1      │ │
+│  │ Health Init.     ██████ 3.1x │  │ Reports       ████ 2      │ │
+│  │ Skill Training   ████ 2.0x │  │ Evidence      ██  1      │ │
+│  │                              │  │ SROI          ██████ 3    │ │
+│  │                              │  │ Report        ████ 2      │ │
+│  │                              │  ├────────────────────────────┤ │
+│  │                              │  │ Evidence Coverage          │ │
+│  │                              │  │ ████████████░░░░ 72%      │ │
+│  │                              │  │ 18 of 25 KPIs verified    │ │
+│  └──────────────────────────────┘  └────────────────────────────┘ │
+│                                                                  │
+│  ⚠ 2 projects have behind-target KPIs                           │
+│    Health Initiative: 3 behind · Skill Training: 1 behind       │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Summary Metric Cards (PA-F1):**
+- Grid: 5 columns on desktop, 2 on tablet, 1 on mobile
+- Standard white card styling (12px radius, border, shadow-sm)
+- Portfolio SROI card: Dark navy gradient (`#0F172A` → `#1E293B`), gold number (`#F59E0B`), counter animation from 0
+- KPI Health card: Three colored dot/count pairs (emerald=on-track, amber=at-risk, red=behind)
+- Pipeline Mini: Tiny horizontal bar segments colored by stage accent colors
+- Currency display: `₹X.XX Cr` (≥1Cr), `₹X.XX L` (≥1L), `₹X,XXX` (smaller)
+- Staggered entrance animation (100ms per card)
+
+**SROI Comparison Chart (PA-F2):**
+- White card container with "SROI by Project" heading
+- Horizontal SVG bar chart, one bar per project with `calculatedRatio`
+- Bar colors: green `#059669` (>3x), gold `#D97706` (1-3x), red `#DC2626` (<1x)
+- Ratio label at end of each bar
+- Bar fill animation (800ms, easeOutCubic, staggered)
+- Empty state: "No SROI data yet" when no projects have calculated ratios
+
+**Pipeline Funnel (PA-F3):**
+- White card with "Pipeline Stages" heading
+- 5 horizontal bars, colored by stage accent (teal → emerald → blue → gold → purple)
+- Bar width proportional to project count at that stage
+- Stage label + count on each row
+
+**Evidence Coverage Meter (PA-F4):**
+- White card with "Evidence Coverage" heading
+- Single progress bar (h-3, rounded): green (>80%), gold (50-80%), red (<50%)
+- Text: "X of Y KPIs have verified evidence (Z%)"
+- Fill animation (800ms, easeOutCubic)
+
+**Risk Banner (PA-F5):**
+- Full-width, red-50 background, red-200 border
+- AlertTriangle icon + "Projects with Behind-Target KPIs" heading
+- Lists project names with behind/at-risk counts
+- Hidden when no projects have behind KPIs
+
+### 4A.7 Edge Cases
+
+- **0 projects**: Analytics section not rendered
+- **1 project, no data yet (stage 1, nothing confirmed)**: Cards show zero/N/A values
+- **No SROI calculated on any project**: SROI card shows "—", SROI chart shows empty state
+- **Zero total investment**: Portfolio SROI shows "N/A"
+- **No progress reports uploaded**: KPI Health shows "0 KPIs tracked", Risk Banner hidden
+- **No evidence uploaded**: Coverage shows "0 of N (0%)" in red
+- **Long project names in SROI chart**: Truncated with ellipsis
+
+---
+
 ## 5. Module 0: Application Shell (Per Project)
 
 ### 5.1 Purpose
@@ -1014,6 +1166,8 @@ The MVP is complete when:
 
 7. **Deployable:** Running on Vercel with stable URL
 
+8. **Portfolio analytics works:** Dashboard shows aggregated metrics (investment, SROI, KPI health, pipeline, evidence coverage) across all projects when 1+ projects exist
+
 ---
 
 ## 15. Out of Scope for MVP
@@ -1028,7 +1182,7 @@ The following are explicitly NOT included in this MVP:
 - Mobile-optimized UI (tablet minimum)
 - Multi-language support
 - Accessibility audit (basic only)
-- Cross-project reporting / portfolio-level analytics
+- ~~Cross-project reporting / portfolio-level analytics~~ *(moved into scope — see §4A)*
 
 ---
 

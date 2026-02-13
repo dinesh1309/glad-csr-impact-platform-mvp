@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { AIStatusIndicator } from "@/components/shell/AIStatusIndicator";
 import { ProjectCard } from "./ProjectCard";
 import { CreateProjectDialog } from "./CreateProjectDialog";
+import { PortfolioAnalytics } from "./PortfolioAnalytics";
 
 export function ProjectDashboard() {
   const projects = useStore((s) => s.projects);
@@ -62,6 +63,9 @@ export function ProjectDashboard() {
             </Button>
           )}
         </div>
+
+        {/* Portfolio analytics */}
+        <PortfolioAnalytics projects={projects} />
 
         {/* Projects grid or empty state */}
         {projects.length === 0 ? (
